@@ -1,7 +1,10 @@
 package server;
 
+import utils.cmd.Message;
+
 import java.io.*;
 import java.net.Socket;
+import java.util.UUID;
 
 /**
  * @author professorik
@@ -10,6 +13,7 @@ import java.net.Socket;
  */
 class ServerSomething extends Thread {
 
+    private UUID ID;
     private final Socket socket;
     private final BufferedReader in;
     private final BufferedWriter out;
@@ -26,41 +30,31 @@ class ServerSomething extends Thread {
     public void run() {
         String word;
         try {
-            word = in.readLine();
-            try {
-                out.write(word + "\n");
-                out.flush();
-            } catch (IOException ignored) {
-            }
-            try {
-                while (true) {
-                    word = in.readLine();
-                    if (word.equals("stop")) {
-                        this.downService();
-                        break;
-                    }
-                    System.out.println("Echoing: " + word);
-                    Server.story.addStoryEl(word);
-                    for (ServerSomething vr : Server.serverList) {
-                        vr.send(word);
-                    }
+            while (true) {
+                word = in.readLine();
+                if (word.equals("stop")) {
+                    this.downService();
+                    break;
                 }
-            } catch (NullPointerException ignored) {
+                var msg = Message.parse(word);
+                if (msg.getMessage().equals("s")) {
+                    ID = UUID.fromString(msg.getID());
+                    Server.match(this);
+                    continue;
+                }
+                Server.rooms.get(UUID.fromString(msg.getID())).broadcast(msg.getMessage() + ": " + msg.getID());
             }
-
-
-        } catch (IOException e) {
+        } catch (NullPointerException | IOException e) {
             this.downService();
         }
     }
 
-    private void send(String msg) {
+    protected void send(String msg) {
         try {
             out.write(msg + "\n");
             out.flush();
         } catch (IOException ignored) {
         }
-
     }
 
     private void downService() {
@@ -76,5 +70,9 @@ class ServerSomething extends Thread {
             }
         } catch (IOException ignored) {
         }
+    }
+
+    public UUID getID() {
+        return ID;
     }
 }

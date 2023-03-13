@@ -1,6 +1,7 @@
 package server;
 
 import java.util.LinkedList;
+import java.util.UUID;
 
 /**
  * @author professorik
@@ -9,18 +10,28 @@ import java.util.LinkedList;
  */
 public class Room {
 
-    private final String ID;
+    private final UUID ID;
     private final LinkedList<ServerSomething> users = new LinkedList<>();
 
     public Room() {
-        ID = "hello";
+        ID = UUID.randomUUID();
     }
 
     protected void addMember(ServerSomething member){
         users.add(member);
     }
 
-    public String getID() {
+    protected void handshake(){
+        broadcast("S: " + ID);
+    }
+
+    protected void broadcast(String cmd) {
+        for (ServerSomething vr: users) {
+            vr.send(cmd);
+        }
+    }
+
+    protected UUID getID() {
         return ID;
     }
 }

@@ -3,10 +3,7 @@ package server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 
 public class Server {
 
@@ -14,7 +11,7 @@ public class Server {
     public static LinkedList<ServerSomething> serverList = new LinkedList<>();
     public static Story story;
     public static Queue<ServerSomething> pull = new LinkedList<>();
-    public static Map<ServerSomething, Room> rooms = new HashMap<>();
+    public static Map<UUID, Room> rooms = new HashMap<>();
 
     public static void main(String[] args) throws IOException {
         try (ServerSocket server = new ServerSocket(PORT)) {
@@ -24,8 +21,7 @@ public class Server {
                 Socket socket = server.accept();
                 try {
                     var smth = new ServerSomething(socket);
-                    serverList.add(smth);
-                    match(smth);
+                    //serverList.add(smth);
                 } catch (IOException e) {
                     socket.close();
                 }
@@ -43,8 +39,9 @@ public class Server {
         var room = new Room();
         room.addMember(member);
         room.addMember(opponent);
+        room.handshake();
 
-        rooms.put(member, room);
-        rooms.put(opponent, room);
+        rooms.put(member.getID(), room);
+        rooms.put(opponent.getID(), room);
     }
 }

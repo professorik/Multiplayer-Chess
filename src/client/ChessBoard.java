@@ -1,5 +1,7 @@
 package client;
 
+import utils.chess.Pieces;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -11,15 +13,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class ChessBoard extends JPanel implements MouseListener, MouseMotionListener {
-
-    public enum Pieces {
-        PAWN,
-        ROOK,
-        BISHOP,
-        KNIGHT,
-        KING,
-        QUEEN
-    }
 
     private static final Image[][] chessPieceImages = new Image[2][6];
     public static final Pieces[] STARTING_ROW = {
@@ -187,7 +180,7 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
 
     protected static void createImages() {
         try {
-            BufferedImage bi = ImageIO.read(new File("D:\\IdeaProjects\\socket-chess\\src\\client\\assets\\pieces.png"));
+            BufferedImage bi = ImageIO.read(new File("src/client/assets/pieces.png"));
             for (int i = 0; i < 2; i++) {
                 for (int j = 0; j < 6; j++) {
                     chessPieceImages[i][j] = bi.getSubimage(j * 72, i * 72, 72, 72);
@@ -198,7 +191,6 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
             System.exit(1);
         }
     }
-
 
     @Override
     public void mouseEntered(MouseEvent e) {

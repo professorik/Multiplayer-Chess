@@ -1,9 +1,12 @@
 package client;
 
+import utils.cmd.Message;
+
 import java.io.*;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * @author professorik
@@ -16,18 +19,13 @@ class ClientSomething {
     private BufferedReader in;
     private BufferedWriter out;
     private BufferedReader inputUser; //console
-    private String addr;
-    private int port;
-    private String nickname;
-    private Date time;
-    private String dtime;
-    private SimpleDateFormat dt1;
+    private final UUID ID;
+    private UUID roomID;
 
     public ClientSomething(String addr, int port) {
-        this.addr = addr;
-        this.port = port;
+        ID = UUID.randomUUID();
         try {
-            this.socket = new Socket(addr, port);
+            socket = new Socket(addr, port);
         } catch (IOException e) {
             System.err.println("Socket failed");
         }
@@ -35,7 +33,7 @@ class ClientSomething {
             inputUser = new BufferedReader(new InputStreamReader(System.in));
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            this.pressNickname();
+            handshake();
             new ReadMsg().start();
             new WriteMsg().start();
         } catch (IOException e) {
@@ -43,11 +41,13 @@ class ClientSomething {
         }
     }
 
-    private void pressNickname() {
-        System.out.print("Press your nick: ");
+    private void handshake() {
+        send("s: " + ID.toString());
+    }
+
+    private void send(String msg) {
         try {
-            nickname = inputUser.readLine();
-            out.write("Hello " + nickname + "\n");
+            out.write(msg + "\n");
             out.flush();
         } catch (IOException ignored) {
         }
@@ -68,15 +68,19 @@ class ClientSomething {
         @Override
         public void run() {
 
-            String str;
+            String cmd;
             try {
                 while (true) {
-                    str = in.readLine();
-                    if (str.equals("stop")) {
+                    cmd = in.readLine();
+                    System.out.println(cmd);
+                    if (cmd.equals("stop")) {
                         ClientSomething.this.downService();
                         break;
                     }
-                    System.out.println(str);
+                    var msg = Message.parse(cmd);
+                    if (msg.getMessage().equals("S")) {
+                        roomID = UUID.fromString(msg.getID());
+                    }
                 }
             } catch (IOException e) {
                 ClientSomething.this.downService();
@@ -89,20 +93,16 @@ class ClientSomething {
         @Override
         public void run() {
             while (true) {
-                String userWord;
+                String cmd;
                 try {
-                    time = new Date();
-                    dt1 = new SimpleDateFormat("HH:mm:ss");
-                    dtime = dt1.format(time);
-                    userWord = inputUser.readLine();
-                    if (userWord.equals("stop")) {
-                        out.write("stop" + "\n");
+                    cmd = inputUser.readLine();
+                    if (cmd.equals("stop")) {
+                        send("stop");
                         ClientSomething.this.downService();
                         break;
-                    } else {
-                        out.write("(" + dtime + ") " + nickname + ": " + userWord + "\n");
                     }
-                    out.flush();
+
+                    send(cmd + ": " + ID.toString());
                 } catch (IOException e) {
                     ClientSomething.this.downService();
                 }
