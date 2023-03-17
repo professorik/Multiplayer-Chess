@@ -1,4 +1,4 @@
-package client;
+package client.ui;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -16,7 +16,7 @@ public class Ledger extends JPanel {
 
     public Ledger() {
         super(new BorderLayout());
-        setBackground(ChessBoard.background);
+        setBackground(GUI.background);
         setBorder(new EmptyBorder(10, 10, 10, 10));
 
         String[] columnNames = {

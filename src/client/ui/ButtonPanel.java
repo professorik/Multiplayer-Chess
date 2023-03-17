@@ -1,4 +1,4 @@
-package client;
+package client.ui;
 
 import javax.swing.*;
 import java.awt.*;
@@ -51,7 +51,7 @@ public class ButtonPanel extends JPanel {
 
     public ButtonPanel() {
         super(new FlowLayout());
-        setBackground(ChessBoard.background);
+        setBackground(GUI.background);
         add(start);
         add(draw);
         add(resign);

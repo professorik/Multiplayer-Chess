@@ -1,4 +1,4 @@
-package client;
+package client.ui;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,7 +17,7 @@ public class Clock extends JPanel {
     public Clock(int secs) {
         super(new BorderLayout());
         this.secs = secs;
-        this.setBackground(ChessBoard.background);
+        this.setBackground(GUI.background);
 
         setLabel();
         setTimer();

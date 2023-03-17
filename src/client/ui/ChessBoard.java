@@ -1,4 +1,4 @@
-package client;
+package client.ui;
 
 import utils.chess.Pieces;
 
@@ -25,7 +25,6 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
             Pieces.KNIGHT,
             Pieces.ROOK
     };
-    protected static Color background = new Color(43, 43, 44);
 
     private final Color BLACK = new Color(183, 192, 216);
     private final Color WHITE = new Color(232, 237, 249);
@@ -48,7 +47,7 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         addMouseListener(this);
         addMouseMotionListener(this);
 
-        setBackground(background);
+        setBackground(GUI.background);
 
         addButtons();
         addLabels();
@@ -178,7 +177,7 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         return new Dimension(s, s);
     }
 
-    protected static void createImages() {
+    public static void createImages() {
         try {
             BufferedImage bi = ImageIO.read(new File("src/client/assets/pieces.png"));
             for (int i = 0; i < 2; i++) {

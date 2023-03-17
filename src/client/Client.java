@@ -1,5 +1,10 @@
 package client;
 
+import client.ui.GUI;
+
+import javax.swing.*;
+import java.awt.*;
+
 public class Client {
 
     public static String ipAddr = "localhost";
@@ -7,5 +12,19 @@ public class Client {
 
     public static void main(String[] args) {
         new ClientSomething(ipAddr, port);
+
+        Runnable r = () -> {
+            GUI cg = new GUI();
+
+            JFrame f = new JFrame("Socket-Chess");
+            f.add(cg.getGUI());
+            f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            f.setLocationByPlatform(true);
+            f.pack();
+            Dimension size = new Dimension(Math.max(f.getWidth(), 1024), Math.max(f.getHeight(), 710));
+            f.setMinimumSize(size);
+            f.setVisible(true);
+        };
+        SwingUtilities.invokeLater(r);
     }
 }

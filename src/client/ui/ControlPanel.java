@@ -1,4 +1,4 @@
-package client;
+package client.ui;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,10 +15,10 @@ public class ControlPanel extends JPanel {
 
     public ControlPanel() {
         super(new BorderLayout(2, 2));
-        setBackground(ChessBoard.background);
+        setBackground(GUI.background);
 
         JPanel centralPanel = new JPanel(new BorderLayout());
-        centralPanel.setBackground(ChessBoard.background);
+        centralPanel.setBackground(GUI.background);
         centralPanel.add(ledger, BorderLayout.CENTER);
         centralPanel.add(buttonPanel, BorderLayout.SOUTH);
 

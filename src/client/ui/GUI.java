@@ -1,24 +1,24 @@
-package client;
+package client.ui;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 
-public class Test {
+public class GUI {
+
+    protected static Color background = new Color(43, 43, 44);
 
     private final JPanel GUI = new JPanel(new BorderLayout(2, 2));
-    private ChessBoard chessBoard;
     private final JPanel controlPanel = new ControlPanel();
 
-    Test() {
+    private ChessBoard chessBoard;
+
+    public GUI() {
         initializeGui(true);
     }
 
     public final void initializeGui(boolean white) {
-        GUI.setBackground(ChessBoard.background);
+        GUI.setBackground(background);
         GUI.setBorder(new EmptyBorder(5, 5, 5, 5));
         ChessBoard.createImages();
 
@@ -39,21 +39,5 @@ public class Test {
         chessBoard = new ChessBoard(white);
         chessBoard.setBorder(null);
         GUI.add(chessBoard, BorderLayout.WEST);
-    }
-
-    public static void main(String[] args) {
-        Runnable r = () -> {
-            Test cg = new Test();
-
-            JFrame f = new JFrame("Socket-Chess");
-            f.add(cg.getGUI());
-            f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            f.setLocationByPlatform(true);
-            f.pack();
-            Dimension size = new Dimension(Math.max(f.getWidth(), 1024), Math.max(f.getHeight(), 710));
-            f.setMinimumSize(size);
-            f.setVisible(true);
-        };
-        SwingUtilities.invokeLater(r);
     }
 }
