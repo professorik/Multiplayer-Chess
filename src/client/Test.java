@@ -1,35 +1,30 @@
 package client;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
 public class Test {
 
-    private final JPanel GUI = new JPanel(new BorderLayout(3, 3));
-    private JPanel boardConstrain;
+    private final JPanel GUI = new JPanel(new BorderLayout(2, 2));
+    private ChessBoard chessBoard;
+    private final JPanel controlPanel = new ControlPanel();
 
     Test() {
         initializeGui(true);
     }
 
     public final void initializeGui(boolean white) {
+        GUI.setBackground(ChessBoard.background);
+        GUI.setBorder(new EmptyBorder(5, 5, 5, 5));
         ChessBoard.createImages();
 
-        GUI.setBorder(new EmptyBorder(5, 5, 5, 5));
-        JToolBar tools = new JToolBar();
-        tools.setFloatable(false);
-        GUI.add(tools, BorderLayout.PAGE_START);
-        Action newGameAction = new AbstractAction("New") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setupNewGame(!white);
-            }
-        };
-        tools.add(newGameAction);
-
         setupNewGame(white);
+
+        GUI.add(controlPanel, BorderLayout.CENTER);
     }
 
     public final JComponent getGUI() {
@@ -37,15 +32,13 @@ public class Test {
     }
 
     private void setupNewGame(boolean white) {
-        if (boardConstrain != null) {
-            boardConstrain.setVisible(false);
-            GUI.remove(boardConstrain);
+        if (chessBoard != null) {
+            chessBoard.setVisible(false);
+            GUI.remove(chessBoard);
         }
-        ChessBoard chessBoard = new ChessBoard(white);
-        boardConstrain = new JPanel(new GridBagLayout());
-        boardConstrain.setBackground(chessBoard.getBackground());
-        boardConstrain.add(chessBoard);
-        GUI.add(boardConstrain);
+        chessBoard = new ChessBoard(white);
+        chessBoard.setBorder(null);
+        GUI.add(chessBoard, BorderLayout.WEST);
     }
 
     public static void main(String[] args) {
@@ -57,7 +50,7 @@ public class Test {
             f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             f.setLocationByPlatform(true);
             f.pack();
-            Dimension size = new Dimension(Math.max(f.getWidth(), 650), Math.max(f.getHeight(), 710));
+            Dimension size = new Dimension(Math.max(f.getWidth(), 1024), Math.max(f.getHeight(), 710));
             f.setMinimumSize(size);
             f.setVisible(true);
         };

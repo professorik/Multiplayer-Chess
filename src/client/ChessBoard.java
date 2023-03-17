@@ -25,6 +25,7 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
             Pieces.KNIGHT,
             Pieces.ROOK
     };
+    protected static Color background = new Color(43, 43, 44);
 
     private final Color BLACK = new Color(183, 192, 216);
     private final Color WHITE = new Color(232, 237, 249);
@@ -47,8 +48,7 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         addMouseListener(this);
         addMouseMotionListener(this);
 
-        Color ochre = new Color(43, 43, 44);
-        setBackground(ochre);
+        setBackground(background);
 
         addButtons();
         addLabels();
