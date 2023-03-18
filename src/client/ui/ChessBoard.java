@@ -1,5 +1,7 @@
 package client.ui;
 
+import client.Main;
+import client.cmd.MoveCmd;
 import utils.chess.Pieces;
 
 import javax.imageio.ImageIO;
@@ -14,6 +16,8 @@ import java.io.File;
 
 public class ChessBoard extends JPanel implements MouseListener, MouseMotionListener {
 
+    private final JLayeredPane layeredPane;
+    private final JPanel chessBoard;
     private static final Image[][] chessPieceImages = new Image[2][6];
     public static final Pieces[] STARTING_ROW = {
             Pieces.ROOK,
@@ -34,9 +38,24 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
     private JLabel pieceToMoveButton = null;
     private int xAdj;
     private int yAdj;
+    private int prevX;
+    private int prevY;
 
     public ChessBoard(boolean white) {
-        super(new GridLayout(0, 8));
+        super(new BorderLayout());
+        Dimension boardSize = new Dimension(700, 700);
+
+        layeredPane = new JLayeredPane();
+        add(layeredPane, BorderLayout.CENTER);
+        layeredPane.setPreferredSize(boardSize);
+        layeredPane.addComponentListener(new AdaptiveBoard());
+
+        chessBoard = new JPanel();
+        layeredPane.add(chessBoard, JLayeredPane.DEFAULT_LAYER);
+        chessBoard.setLayout(new GridLayout(0, 8));
+        chessBoard.setPreferredSize(boardSize);
+        chessBoard.setMinimumSize(boardSize);
+
         this.white = white;
 
         setBorder(new CompoundBorder(
@@ -57,7 +76,7 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
     @Override
     public void mousePressed(MouseEvent e) {
         pieceToMoveButton = null;
-        Component c = this.findComponentAt(e.getX(), e.getY());
+        Component c = chessBoard.findComponentAt(e.getX(), e.getY());
 
         if (c instanceof JPanel) return;
 
@@ -66,8 +85,10 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         yAdj = parentLocation.y - e.getY();
         pieceToMoveButton = (JLabel)c;
         pieceToMoveButton.setLocation(e.getX() + xAdj, e.getY() + yAdj);
+        prevX = parentLocation.x;
+        prevY = parentLocation.y;
         pieceToMoveButton.setSize(pieceToMoveButton.getWidth(), pieceToMoveButton.getHeight());
-        this.add(pieceToMoveButton, JLayeredPane.DRAG_LAYER, 0);
+        layeredPane.add(pieceToMoveButton, JLayeredPane.DRAG_LAYER);
     }
 
     @Override
@@ -75,8 +96,21 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         if (pieceToMoveButton == null) return;
 
         pieceToMoveButton.setVisible(false);
-        Component c = this.findComponentAt(e.getX(), e.getY());
 
+        Container parent = getParentByPos(e.getX(), e.getY());
+        if (parent == null) {
+            new MoveCmd(Main.client).execute();
+            parent = getParentByPos(prevX, prevY);
+        } else {
+            prevX = e.getX();
+            prevY = e.getY();
+        }
+        pieceToMoveButton.setVisible(true);
+        putCentered(pieceToMoveButton, parent);
+    }
+
+    private Container getParentByPos(int x, int y) {
+        Component c = chessBoard.findComponentAt(x, y);
         Container parent;
         if (c instanceof JLabel){
             parent = c.getParent();
@@ -84,8 +118,7 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         } else {
             parent = (Container) c;
         }
-        putCentered(pieceToMoveButton, parent);
-        pieceToMoveButton.setVisible(true);
+        return parent;
     }
 
     @Override
@@ -99,7 +132,7 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
             for (int j = 0; j < chessBoardSquares[i].length; j++) {
                 JPanel square = new JPanel(new SpringLayout());
                 chessBoardSquares[j][i] = square;
-                add(chessBoardSquares[j][i]);
+                chessBoard.add(chessBoardSquares[j][i]);
 
                 if ((j % 2 ^ i % 2) == 0)
                     square.setBackground(WHITE);
@@ -205,5 +238,28 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
 
     @Override
     public void mouseClicked(MouseEvent e) {
+    }
+
+    private class AdaptiveBoard implements ComponentListener {
+        @Override
+        public void componentShown(ComponentEvent e) {
+        }
+
+        @Override
+        public void componentResized(ComponentEvent e) {
+            chessBoard.setPreferredSize(e.getComponent().getSize());
+            chessBoard.setMaximumSize(e.getComponent().getSize());
+            chessBoard.setSize(e.getComponent().getSize());
+            chessBoard.revalidate();
+            chessBoard.repaint();
+        }
+
+        @Override
+        public void componentMoved(ComponentEvent e) {
+        }
+
+        @Override
+        public void componentHidden(ComponentEvent e) {
+        }
     }
 }

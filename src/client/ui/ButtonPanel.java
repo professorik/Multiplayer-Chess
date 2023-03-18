@@ -1,7 +1,15 @@
 package client.ui;
 
+import client.Main;
+import client.cmd.Command;
+import client.cmd.DrawCmd;
+import client.cmd.ResignCmd;
+import client.cmd.StartCmd;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.geom.RoundRectangle2D;
 
@@ -57,7 +65,18 @@ public class ButtonPanel extends JPanel {
         add(resign);
         add(acceptDraw);
 
+        start.addActionListener(e -> executeCommand(new StartCmd(Main.client)));
+        draw.addActionListener(e -> executeCommand(new DrawCmd(Main.client)));
+        resign.addActionListener(e -> executeCommand(new ResignCmd(Main.client)));
+        acceptDraw.addActionListener(e -> executeCommand(new DrawCmd(Main.client)));
+
         setState(State.Standard);
+    }
+
+    private void executeCommand(Command command) {
+        if (command.execute()) {
+            System.out.println("Success");
+        }
     }
 
     public void setState(State state) {
