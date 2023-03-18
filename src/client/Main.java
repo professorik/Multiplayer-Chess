@@ -10,13 +10,12 @@ public class Main {
     public static String ipAddr = "localhost";
     public static int port = 8080;
     public static Client client;
+    public static GUI cg = new GUI();
 
     public static void main(String[] args) {
         client = new Client(ipAddr, port);
 
         Runnable r = () -> {
-            GUI cg = new GUI();
-
             JFrame f = new JFrame("Socket-Chess");
             f.add(cg.getGUI());
             f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

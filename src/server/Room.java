@@ -1,5 +1,7 @@
 package server;
 
+import utils.cmd.Message;
+
 import java.util.LinkedList;
 import java.util.UUID;
 
@@ -27,7 +29,7 @@ public class Room {
 
     protected void broadcast(String cmd) {
         for (ServerSomething vr: users) {
-            vr.send(cmd);
+            vr.sendObj(Message.parse(cmd));
         }
     }
 

@@ -15,58 +15,59 @@ class ServerSomething extends Thread {
 
     private UUID ID;
     private final Socket socket;
-    private final BufferedReader in;
-    private final BufferedWriter out;
+    private ObjectOutputStream oos;
+    private ObjectInputStream ois;
 
     public ServerSomething(Socket socket) throws IOException {
         this.socket = socket;
-        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-        Server.story.printStory(out);
+        oos = new ObjectOutputStream(socket.getOutputStream());
+        ois = new ObjectInputStream(socket.getInputStream());
         start();
     }
 
     @Override
     public void run() {
-        String word;
         try {
             while (true) {
-                word = in.readLine();
-                if (word.equals("stop")) {
-                    this.downService();
-                    break;
+                var tmp = ois.readObject();
+                if (tmp instanceof Message msg) {
+                    if (msg.getMessage().equals("stop")) {
+                        this.downService();
+                        return;
+                    }
+                    if (msg.getMessage().equals("s")) {
+                        ID = UUID.fromString(msg.getID());
+                        Server.match(this);
+                        continue;
+                    }
+                    System.out.println(msg.getID() + " " + msg.getMessage());
+                    Server.rooms.get(UUID.fromString(msg.getID())).broadcast(msg.getMessage() + ": " + msg.getID());
                 }
-                var msg = Message.parse(word);
-                if (msg.getMessage().equals("s")) {
-                    ID = UUID.fromString(msg.getID());
-                    Server.match(this);
-                    continue;
-                }
-                Server.rooms.get(UUID.fromString(msg.getID())).broadcast(msg.getMessage() + ": " + msg.getID());
             }
         } catch (NullPointerException | IOException e) {
             this.downService();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
-    protected void send(String msg) {
+    protected void sendObj(Message msg) {
         try {
-            out.write(msg + "\n");
-            out.flush();
+            oos.writeObject(msg);
+            oos.flush();
         } catch (IOException ignored) {
         }
     }
 
     private void downService() {
+        if (socket.isClosed()) return;
         try {
-            if (!socket.isClosed()) {
-                socket.close();
-                in.close();
-                out.close();
-                for (ServerSomething vr : Server.serverList) {
-                    if (vr.equals(this)) vr.interrupt();
-                    Server.serverList.remove(this);
-                }
+            socket.close();
+            ois.close();
+            oos.close();
+            for (ServerSomething vr : Server.serverList) {
+                if (vr.equals(this)) vr.interrupt();
+                Server.serverList.remove(this);
             }
         } catch (IOException ignored) {
         }

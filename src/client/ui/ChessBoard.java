@@ -41,6 +41,10 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
     private int prevX;
     private int prevY;
 
+    static {
+        createImages();
+    }
+
     public ChessBoard(boolean white) {
         super(new BorderLayout());
         Dimension boardSize = new Dimension(700, 700);
@@ -99,14 +103,20 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
 
         Container parent = getParentByPos(e.getX(), e.getY());
         if (parent == null) {
-            new MoveCmd(Main.client).execute();
             parent = getParentByPos(prevX, prevY);
         } else {
+            new MoveCmd(Main.client, getCoordsByPos(prevX, prevY), getCoordsByPos(e.getX(), e.getY())).execute();
             prevX = e.getX();
             prevY = e.getY();
         }
         pieceToMoveButton.setVisible(true);
         putCentered(pieceToMoveButton, parent);
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        if (pieceToMoveButton == null) return;
+        pieceToMoveButton.setLocation(e.getX() + xAdj, e.getY() + yAdj);
     }
 
     private Container getParentByPos(int x, int y) {
@@ -121,10 +131,21 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         return parent;
     }
 
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        if (pieceToMoveButton == null) return;
-        pieceToMoveButton.setLocation(e.getX() + xAdj, e.getY() + yAdj);
+    private int getCoordsByPos(int x, int y) {
+        Component c = chessBoard.findComponentAt(x, y);
+        Container parent = (Container) c;
+        if (c instanceof JLabel){
+            parent = c.getParent();
+        }
+        for (int i = 0; i < chessBoardSquares.length; i++) {
+            for (int j = 0; j < chessBoardSquares.length; j++) {
+                if (chessBoardSquares[i][j] == parent) {
+                    System.out.println(i + " " + j);
+                    return i*8 + j;
+                }
+            }
+        }
+        return -1;
     }
 
     private void addButtons(){
@@ -192,6 +213,20 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         panel.add(label);
     }
 
+    private static void createImages() {
+        try {
+            BufferedImage bi = ImageIO.read(new File("src/client/assets/pieces.png"));
+            for (int i = 0; i < 2; i++) {
+                for (int j = 0; j < 6; j++) {
+                    chessPieceImages[i][j] = bi.getSubimage(j * 72, i * 72, 72, 72);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
     @Override
     public Dimension getPreferredSize() {
         Dimension d = super.getPreferredSize();
@@ -208,20 +243,6 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         int h = (int) prefSize.getHeight();
         int s = Math.min(w, h);
         return new Dimension(s, s);
-    }
-
-    public static void createImages() {
-        try {
-            BufferedImage bi = ImageIO.read(new File("src/client/assets/pieces.png"));
-            for (int i = 0; i < 2; i++) {
-                for (int j = 0; j < 6; j++) {
-                    chessPieceImages[i][j] = bi.getSubimage(j * 72, i * 72, 72, 72);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
     }
 
     @Override

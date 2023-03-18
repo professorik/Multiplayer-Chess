@@ -9,13 +9,18 @@ import client.Client;
  */
 public class MoveCmd extends Command {
 
-    public MoveCmd(Client client) {
+    private final int from;
+    private final int to;
+
+    public MoveCmd(Client client, int from, int to) {
         super(client);
+        this.from = from;
+        this.to = to;
     }
 
     @Override
     public boolean execute() {
-        System.out.println("move");
-        return false;
+        client.move(from, to);
+        return true;
     }
 }

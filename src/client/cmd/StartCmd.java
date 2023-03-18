@@ -15,7 +15,7 @@ public class StartCmd extends Command {
 
     @Override
     public boolean execute() {
-        System.out.println("start");
+        client.start();
         return false;
     }
 }

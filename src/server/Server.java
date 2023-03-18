@@ -20,8 +20,7 @@ public class Server {
             while (true) {
                 Socket socket = server.accept();
                 try {
-                    var smth = new ServerSomething(socket);
-                    //serverList.add(smth);
+                   new ServerSomething(socket);
                 } catch (IOException e) {
                     socket.close();
                 }

@@ -8,8 +8,6 @@ import client.cmd.StartCmd;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.geom.RoundRectangle2D;
 
@@ -25,7 +23,7 @@ public class ButtonPanel extends JPanel {
     private final JButton acceptDraw = new FlatButton("Accept");
     private final JButton resign = new FlatButton("Resign");
 
-    protected enum State {
+    public enum State {
         Initial {
             @Override
             public void show(ButtonPanel panel) {
@@ -70,7 +68,7 @@ public class ButtonPanel extends JPanel {
         resign.addActionListener(e -> executeCommand(new ResignCmd(Main.client)));
         acceptDraw.addActionListener(e -> executeCommand(new DrawCmd(Main.client)));
 
-        setState(State.Standard);
+        setState(State.Initial);
     }
 
     private void executeCommand(Command command) {

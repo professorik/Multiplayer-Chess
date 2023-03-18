@@ -26,6 +26,10 @@ public class ControlPanel extends JPanel {
         addClocks();
     }
 
+    public void setState(ButtonPanel.State state) {
+        buttonPanel.setState(state);
+    }
+
     private void addClocks() {
         Clock upper = new Clock(300);
         Clock lower = new Clock(300);

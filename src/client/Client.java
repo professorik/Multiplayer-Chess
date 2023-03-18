@@ -1,5 +1,6 @@
 package client;
 
+import client.ui.ButtonPanel;
 import utils.cmd.Message;
 
 import java.io.*;
@@ -14,9 +15,9 @@ import java.util.UUID;
 public class Client {
 
     private Socket socket;
-    private BufferedReader in;
-    private BufferedWriter out;
-    private BufferedReader inputUser; //console
+    private BufferedReader inputUser;
+    private ObjectOutputStream oos;
+    private ObjectInputStream ois;
     private final UUID ID;
     private UUID roomID;
     public static int count = 0;
@@ -29,10 +30,9 @@ public class Client {
             System.err.println("Socket failed");
         }
         try {
+            oos = new ObjectOutputStream(socket.getOutputStream());
+            ois = new ObjectInputStream(socket.getInputStream());
             inputUser = new BufferedReader(new InputStreamReader(System.in));
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            handshake();
             new ReadMsg().start();
             new WriteMsg().start();
         } catch (IOException e) {
@@ -40,25 +40,29 @@ public class Client {
         }
     }
 
-    private void handshake() {
-        send("s: " + ID.toString());
+    public void start() {
+        sendObj(new Message(ID.toString(), "s"));
     }
 
-    private void send(String msg) {
+    public void move(int from, int to) {
+        String fromStr = from / 8 + "," + from % 8;
+        String toStr = to / 8 + "," + to % 8;
+        sendObj(new Message(ID.toString(), String.format("m: %s : %s", fromStr, toStr)));
+    }
+
+    private void sendObj(Message msg) {
         try {
-            out.write(msg + "\n");
-            out.flush();
+            oos.writeObject(msg);
         } catch (IOException ignored) {
         }
     }
 
     private void downService() {
+        if (socket.isClosed()) return;
         try {
-            if (!socket.isClosed()) {
-                socket.close();
-                in.close();
-                out.close();
-            }
+            socket.close();
+            ois.close();
+            oos.close();
         } catch (IOException ignored) {
         }
     }
@@ -66,23 +70,25 @@ public class Client {
     private class ReadMsg extends Thread {
         @Override
         public void run() {
-
-            String cmd;
             try {
                 while (true) {
-                    cmd = in.readLine();
-                    System.out.println(cmd);
-                    if (cmd.equals("stop")) {
-                        Client.this.downService();
-                        break;
-                    }
-                    var msg = Message.parse(cmd);
-                    if (msg.getMessage().equals("S")) {
-                        roomID = UUID.fromString(msg.getID());
+                    var tmp = ois.readObject();
+                    if (tmp instanceof Message msg) {
+                        if (msg.getMessage().equals("stop")) {
+                            Client.this.downService();
+                            return;
+                        }
+                        if (msg.getMessage().equals("S")) {
+                            roomID = UUID.fromString(msg.getID());
+                            Main.cg.setState(ButtonPanel.State.Standard);
+                        }
+                        System.out.println(msg.getID() + " " + msg.getMessage());
                     }
                 }
             } catch (IOException e) {
                 Client.this.downService();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -92,16 +98,14 @@ public class Client {
         @Override
         public void run() {
             while (true) {
-                String cmd;
                 try {
-                    cmd = inputUser.readLine();
+                    String cmd = inputUser.readLine();
+                    sendObj(new Message(ID.toString(), cmd));
+
                     if (cmd.equals("stop")) {
-                        send("stop");
                         Client.this.downService();
                         break;
                     }
-
-                    send(cmd + ": " + ID.toString());
                 } catch (IOException e) {
                     Client.this.downService();
                 }

@@ -9,7 +9,7 @@ public class GUI {
     protected static Color background = new Color(43, 43, 44);
 
     private final JPanel GUI = new JPanel(new BorderLayout(2, 2));
-    private final JPanel controlPanel = new ControlPanel();
+    private final ControlPanel controlPanel = new ControlPanel();
 
     private ChessBoard chessBoard;
 
@@ -20,11 +20,14 @@ public class GUI {
     public final void initializeGui(boolean white) {
         GUI.setBackground(background);
         GUI.setBorder(new EmptyBorder(5, 5, 5, 5));
-        ChessBoard.createImages();
 
         setupNewGame(white);
 
         GUI.add(controlPanel, BorderLayout.CENTER);
+    }
+
+    public void setState(ButtonPanel.State state) {
+        controlPanel.setState(state);
     }
 
     public final JComponent getGUI() {
