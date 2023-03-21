@@ -1,6 +1,7 @@
 package server;
 
 import utils.cmd.Message;
+import utils.cmd.Start;
 
 import java.util.LinkedList;
 import java.util.UUID;
@@ -14,6 +15,7 @@ public class Room {
 
     private final UUID ID;
     private final LinkedList<ServerSomething> users = new LinkedList<>();
+    // here insert the chess board
 
     public Room() {
         ID = UUID.randomUUID();
@@ -24,16 +26,14 @@ public class Room {
     }
 
     protected void handshake(){
-        broadcast("S: " + ID);
+        users.getFirst().sendObj(new Start(ID, true));
+        users.getLast().sendObj(new Start(ID, false));
     }
 
-    protected void broadcast(String cmd) {
+    protected void broadcast(Message msg) {
+        msg.setID(ID);
         for (ServerSomething vr: users) {
-            vr.sendObj(Message.parse(cmd));
+            vr.sendObj(msg);
         }
-    }
-
-    protected UUID getID() {
-        return ID;
     }
 }

@@ -2,6 +2,9 @@ package client;
 
 import client.ui.ButtonPanel;
 import utils.cmd.Message;
+import utils.cmd.Move;
+import utils.cmd.Start;
+import utils.cmd.SuggestDraw;
 
 import java.io.*;
 import java.net.Socket;
@@ -20,7 +23,7 @@ public class Client {
     private ObjectInputStream ois;
     private final UUID ID;
     private UUID roomID;
-    public static int count = 0;
+    private boolean white;
 
     public Client(String addr, int port) {
         ID = UUID.randomUUID();
@@ -41,13 +44,11 @@ public class Client {
     }
 
     public void start() {
-        sendObj(new Message(ID.toString(), "s"));
+        sendObj(new Message(ID, "s"));
     }
 
     public void move(int from, int to) {
-        String fromStr = from / 8 + "," + from % 8;
-        String toStr = to / 8 + "," + to % 8;
-        sendObj(new Message(ID.toString(), String.format("m: %s : %s", fromStr, toStr)));
+        sendObj(new Move(ID, white, from, to));
     }
 
     private void sendObj(Message msg) {
@@ -73,16 +74,31 @@ public class Client {
             try {
                 while (true) {
                     var tmp = ois.readObject();
-                    if (tmp instanceof Message msg) {
-                        if (msg.getMessage().equals("stop")) {
-                            Client.this.downService();
-                            return;
+                    switch (tmp) {
+                        case Move cmd -> {
+                            if (cmd.isWhite() == white) {
+                                continue;
+                            }
+                            Main.cg.getChessBoard().movePiece(cmd.getFrom(), cmd.getTo());
                         }
-                        if (msg.getMessage().equals("S")) {
-                            roomID = UUID.fromString(msg.getID());
+                        case Start cmd -> {
+                            roomID = cmd.getID();
+                            white = cmd.isWhite();
+                            Main.cg.setupNewGame(white);
                             Main.cg.setState(ButtonPanel.State.Standard);
                         }
-                        System.out.println(msg.getID() + " " + msg.getMessage());
+                        case SuggestDraw cmd -> {
+                            roomID = cmd.getID();
+                            Main.cg.setState(ButtonPanel.State.Offered);
+                        }
+                        case Message cmd -> {
+                            if (cmd.getMessage().equals("stop")) {
+                                Client.this.downService();
+                                return;
+                            }
+                            System.out.println(cmd.getID() + " " + cmd.getMessage());
+                        }
+                        default -> {}
                     }
                 }
             } catch (IOException e) {
@@ -100,7 +116,7 @@ public class Client {
             while (true) {
                 try {
                     String cmd = inputUser.readLine();
-                    sendObj(new Message(ID.toString(), cmd));
+                    sendObj(new Message(ID, cmd));
 
                     if (cmd.equals("stop")) {
                         Client.this.downService();

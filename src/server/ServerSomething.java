@@ -1,6 +1,7 @@
 package server;
 
 import utils.cmd.Message;
+import utils.cmd.Move;
 
 import java.io.*;
 import java.net.Socket;
@@ -30,18 +31,22 @@ class ServerSomething extends Thread {
         try {
             while (true) {
                 var tmp = ois.readObject();
+                if (tmp instanceof Move cmd) {
+                    Server.rooms.get(cmd.getID()).broadcast(cmd);
+                    continue;
+                }
                 if (tmp instanceof Message msg) {
                     if (msg.getMessage().equals("stop")) {
                         this.downService();
                         return;
                     }
                     if (msg.getMessage().equals("s")) {
-                        ID = UUID.fromString(msg.getID());
+                        ID = msg.getID();
                         Server.match(this);
                         continue;
                     }
                     System.out.println(msg.getID() + " " + msg.getMessage());
-                    Server.rooms.get(UUID.fromString(msg.getID())).broadcast(msg.getMessage() + ": " + msg.getID());
+                    Server.rooms.get(msg.getID()).broadcast(msg);
                 }
             }
         } catch (NullPointerException | IOException e) {

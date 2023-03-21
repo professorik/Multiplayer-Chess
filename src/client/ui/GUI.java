@@ -14,7 +14,7 @@ public class GUI {
     private ChessBoard chessBoard;
 
     public GUI() {
-        initializeGui(true);
+        initializeGui(false);
     }
 
     public final void initializeGui(boolean white) {
@@ -34,7 +34,7 @@ public class GUI {
         return GUI;
     }
 
-    private void setupNewGame(boolean white) {
+    public void setupNewGame(boolean white) {
         if (chessBoard != null) {
             chessBoard.setVisible(false);
             GUI.remove(chessBoard);
@@ -42,5 +42,9 @@ public class GUI {
         chessBoard = new ChessBoard(white);
         chessBoard.setBorder(null);
         GUI.add(chessBoard, BorderLayout.WEST);
+    }
+
+    public ChessBoard getChessBoard() {
+        return chessBoard;
     }
 }

@@ -13,6 +13,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Arrays;
 
 public class ChessBoard extends JPanel implements MouseListener, MouseMotionListener {
 
@@ -113,6 +114,19 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         putCentered(pieceToMoveButton, parent);
     }
 
+    public void movePiece(int from, int to) {
+        int f_x = from / 8, f_y = from % 8;
+        int t_x = to / 8, t_y = to % 8;
+        var ptm = (JLabel) chessBoardSquares[f_x][f_y].getComponent(0);
+        chessBoardSquares[f_x][f_y].remove(0);
+        if (chessBoardSquares[t_x][t_y].getComponents().length > 0) {
+            chessBoardSquares[t_x][t_y].remove(0);
+        }
+        ptm.setVisible(true);
+        putCentered(ptm, chessBoardSquares[t_x][t_y]);
+        repaint();
+    }
+
     @Override
     public void mouseDragged(MouseEvent e) {
         if (pieceToMoveButton == null) return;
@@ -140,8 +154,7 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         for (int i = 0; i < chessBoardSquares.length; i++) {
             for (int j = 0; j < chessBoardSquares.length; j++) {
                 if (chessBoardSquares[i][j] == parent) {
-                    System.out.println(i + " " + j);
-                    return i*8 + j;
+                    return 63 - i*8 - j;
                 }
             }
         }
