@@ -17,7 +17,8 @@ import java.io.File;
 public class ChessBoard extends JPanel implements MouseListener, MouseMotionListener {
 
     private final JLayeredPane layeredPane;
-    private final JPanel chessBoard;
+    private final JPanel board;
+    private final JPanel pieces;
     private static final Image[][] chessPieceImages = new Image[2][6];
     public static final Pieces[] STARTING_ROW = {
             Pieces.ROOK,
@@ -32,7 +33,8 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
 
     private final Color BLACK = new Color(183, 192, 216);
     private final Color WHITE = new Color(232, 237, 249);
-    private final JPanel[][] chessBoardSquares = new JPanel[8][8];
+    private final JPanel[][] boardSquares = new JPanel[8][8];
+    private final JPanel[][] piecesSquares = new JPanel[8][8];
     private final boolean white;
 
     private JLabel pieceToMoveButton = null;
@@ -54,11 +56,18 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         layeredPane.setPreferredSize(boardSize);
         layeredPane.addComponentListener(new AdaptiveBoard());
 
-        chessBoard = new JPanel();
-        layeredPane.add(chessBoard, JLayeredPane.DEFAULT_LAYER);
-        chessBoard.setLayout(new GridLayout(0, 8));
-        chessBoard.setPreferredSize(boardSize);
-        chessBoard.setMinimumSize(boardSize);
+        pieces = new JPanel();
+        layeredPane.add(pieces, JLayeredPane.PALETTE_LAYER);
+        pieces.setOpaque(false);
+        pieces.setLayout(new GridLayout(0, 8));
+        pieces.setPreferredSize(boardSize);
+        pieces.setMinimumSize(boardSize);
+
+        board = new JPanel();
+        layeredPane.add(board, JLayeredPane.DEFAULT_LAYER);
+        board.setLayout(new GridLayout(0, 8));
+        board.setPreferredSize(boardSize);
+        board.setMinimumSize(boardSize);
 
         this.white = white;
 
@@ -75,12 +84,13 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         addButtons();
         addLabels();
         setupNewGame();
+        repaint();
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         pieceToMoveButton = null;
-        Component c = chessBoard.findComponentAt(e.getX(), e.getY());
+        Component c = pieces.findComponentAt(e.getX(), e.getY());
 
         if (c instanceof JPanel) return;
 
@@ -113,31 +123,17 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         putCentered(pieceToMoveButton, parent);
     }
 
-    private void printDesk() {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                System.out.print(chessBoardSquares[j][i].getComponents().length + " ");
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
-
     public void movePiece(int from, int to) {
         int f_x = from / 8, f_y = from % 8;
         int t_x = to / 8, t_y = to % 8;
-        int index = chessBoardSquares[f_x][f_y].getComponents().length - 1;
-        var ptm = (JLabel) chessBoardSquares[f_x][f_y].getComponent(index);
-        chessBoardSquares[f_x][f_y].remove(ptm);
+        var ptm = (JLabel) piecesSquares[f_x][f_y].getComponent(0);
+        piecesSquares[f_x][f_y].remove(0);
 
-        int tmp = 0;
-        if (t_x == 0) ++tmp;
-        if (t_y == 7) ++tmp;
-        if (chessBoardSquares[t_x][t_y].getComponents().length > tmp) {
-            chessBoardSquares[t_x][t_y].remove(chessBoardSquares[t_x][t_y].getComponents().length - 1);
+        if (piecesSquares[t_x][t_y].getComponents().length > 0) {
+            piecesSquares[t_x][t_y].remove(0);
         }
         ptm.setVisible(true);
-        putCentered(ptm, chessBoardSquares[t_x][t_y]);
+        putCentered(ptm, piecesSquares[t_x][t_y]);
         repaint();
     }
 
@@ -148,7 +144,7 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
     }
 
     private Container getParentByPos(int x, int y) {
-        Component c = chessBoard.findComponentAt(x, y);
+        Component c = pieces.findComponentAt(x, y);
         Container parent;
         if (c instanceof JLabel) {
             parent = c.getParent();
@@ -159,14 +155,14 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
     }
 
     private int getCoordsByPos(int x, int y) {
-        Component c = chessBoard.findComponentAt(x, y);
+        Component c = pieces.findComponentAt(x, y);
         Container parent = (Container) c;
         if (c instanceof JLabel) {
             parent = c.getParent();
         }
-        for (int i = 0; i < chessBoardSquares.length; i++) {
-            for (int j = 0; j < chessBoardSquares.length; j++) {
-                if (chessBoardSquares[i][j] == parent) {
+        for (int i = 0; i < piecesSquares.length; i++) {
+            for (int j = 0; j < piecesSquares.length; j++) {
+                if (piecesSquares[i][j] == parent) {
                     return 63 - i * 8 - j;
                 }
             }
@@ -175,29 +171,36 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
     }
 
     private void addButtons() {
-        for (int i = 0; i < chessBoardSquares.length; i++) {
-            for (int j = 0; j < chessBoardSquares[i].length; j++) {
-                JPanel square = new JPanel(new SpringLayout());
-                chessBoardSquares[j][i] = square;
-                chessBoard.add(chessBoardSquares[j][i]);
+        for (int i = 0; i < boardSquares.length; i++) {
+            for (int j = 0; j < boardSquares[i].length; j++) {
+                JPanel boardSq = new JPanel(new SpringLayout());
+                boardSquares[j][i] = boardSq;
+                board.add(boardSquares[j][i]);
 
                 if ((j % 2 ^ i % 2) == 0)
-                    square.setBackground(WHITE);
+                    boardSq.setBackground(WHITE);
                 else
-                    square.setBackground(BLACK);
+                    boardSq.setBackground(BLACK);
+
+                JPanel pieceSq = new JPanel(new SpringLayout());
+                pieceSq.setOpaque(false);
+                piecesSquares[j][i] = pieceSq;
+                pieces.add(piecesSquares[j][i]);
             }
         }
     }
 
     private void addLabels() {
-        for (int i = 0; i < chessBoardSquares.length; i++) {
+        for (int i = 0; i < boardSquares.length; i++) {
             JLabel column = new JLabel(String.valueOf((char) (white ? (int) 'a' + i : (int) 'h' - i)));
+            column.setIgnoreRepaint(true);
             column.setForeground(i % 2 == 0 ? WHITE : BLACK);
-            putBottomRight(column, chessBoardSquares[i][chessBoardSquares.length - 1]);
+            putBottomRight(column, boardSquares[i][boardSquares.length - 1]);
 
             JLabel row = new JLabel(String.valueOf(white ? 8 - i : i + 1));
             row.setForeground(i % 2 == 1 ? WHITE : BLACK);
-            putTopLeft(row, chessBoardSquares[0][i]);
+            row.setIgnoreRepaint(true);
+            putTopLeft(row, boardSquares[0][i]);
         }
     }
 
@@ -208,12 +211,12 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
                 var figure1 = new JLabel(
                         new ImageIcon(chessPieceImages[i][STARTING_ROW[white ? j : (7 - j)].ordinal() * (1 - order[i])])
                 );
-                putCentered(figure1, chessBoardSquares[j][6 * order[i]]);
+                putCentered(figure1, piecesSquares[j][6 * order[i]]);
 
                 var figure2 = new JLabel(
                         new ImageIcon(chessPieceImages[i][STARTING_ROW[white ? j : (7 - j)].ordinal() * order[i]])
                 );
-                putCentered(figure2, chessBoardSquares[j][1 + 6 * order[i]]);
+                putCentered(figure2, piecesSquares[j][1 + 6 * order[i]]);
             }
         }
     }
@@ -294,11 +297,17 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
 
         @Override
         public void componentResized(ComponentEvent e) {
-            chessBoard.setPreferredSize(e.getComponent().getSize());
-            chessBoard.setMaximumSize(e.getComponent().getSize());
-            chessBoard.setSize(e.getComponent().getSize());
-            chessBoard.revalidate();
-            chessBoard.repaint();
+            board.setPreferredSize(e.getComponent().getSize());
+            board.setMaximumSize(e.getComponent().getSize());
+            board.setSize(e.getComponent().getSize());
+            board.revalidate();
+            board.repaint();
+
+            pieces.setPreferredSize(e.getComponent().getSize());
+            pieces.setMaximumSize(e.getComponent().getSize());
+            pieces.setSize(e.getComponent().getSize());
+            pieces.revalidate();
+            pieces.repaint();
         }
 
         @Override
