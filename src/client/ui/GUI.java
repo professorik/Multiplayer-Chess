@@ -50,5 +50,6 @@ public class GUI {
 
     public void toggleClocks(boolean isActive) {
         controlPanel.setClocks(isActive);
+        chessBoard.setTurn(isActive);
     }
 }

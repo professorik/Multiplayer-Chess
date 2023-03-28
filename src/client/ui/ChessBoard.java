@@ -36,12 +36,15 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
     private final JPanel[][] boardSquares = new JPanel[8][8];
     private final JPanel[][] piecesSquares = new JPanel[8][8];
     private final boolean white;
+    private boolean turn = false;
 
     private JLabel pieceToMoveButton = null;
     private int xAdj;
     private int yAdj;
     private int prevX;
     private int prevY;
+    private int clickX = -1;
+    private int clickY = -1;
 
     static {
         createImages();
@@ -89,6 +92,7 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
 
     @Override
     public void mousePressed(MouseEvent e) {
+        if (!turn) return;
         pieceToMoveButton = null;
         Component c = pieces.findComponentAt(e.getX(), e.getY());
 
@@ -107,7 +111,7 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (pieceToMoveButton == null) return;
+        if (!turn || pieceToMoveButton == null) return;
 
         pieceToMoveButton.setVisible(false);
 
@@ -139,8 +143,25 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if (pieceToMoveButton == null) return;
+        if (!turn || pieceToMoveButton == null) return;
         pieceToMoveButton.setLocation(e.getX() + xAdj, e.getY() + yAdj);
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (!turn) return;
+        if (clickX != -1) {
+            int from = getCoordsByPos(clickX, clickY), to = getCoordsByPos(e.getX(), e.getY());
+            new MoveCmd(Client.client, from, to).execute();
+            movePiece(63 - from, 63 - to);
+            clickX = clickY = -1;
+            return;
+        }
+        Component c = pieces.findComponentAt(e.getX(), e.getY());
+        if (c instanceof JPanel tmp && tmp.getComponents().length == 0) return;
+
+        clickX = e.getX();
+        clickY = e.getY();
     }
 
     private Container getParentByPos(int x, int y) {
@@ -221,6 +242,10 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         }
     }
 
+    public void setTurn(boolean turn) {
+        this.turn = turn;
+    }
+
     private void putBottomRight(JLabel label, JPanel panel) {
         if (!(panel.getLayout() instanceof SpringLayout layout)) return;
         layout.putConstraint(SpringLayout.EAST, label, 0, SpringLayout.EAST, panel);
@@ -284,10 +309,6 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
 
     @Override
     public void mouseMoved(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
     }
 
     private class AdaptiveBoard implements ComponentListener {

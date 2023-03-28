@@ -92,8 +92,8 @@ public class ClientHandler {
                             roomID = cmd.getID();
                             white = cmd.isWhite();
                             turn = white;
-                            Client.gui.toggleClocks(turn);
                             Client.gui.setupNewGame(white);
+                            Client.gui.toggleClocks(turn);
                             Client.gui.setState(ButtonPanel.State.Standard);
                         }
                         case SuggestDraw cmd -> {
