@@ -23,7 +23,7 @@ public class King extends Piece {
 
     @Override
     public boolean canMove(Board board, Spot start, Spot end) {
-        if (end.getPiece().isWhite() == this.isWhite()) return false;
+        if (end.getPiece() != null && end.getPiece().isWhite() == this.isWhite()) return false;
 
         int x = Math.abs(start.getX() - end.getX());
         int y = Math.abs(start.getY() - end.getY());
@@ -52,5 +52,10 @@ public class King extends Piece {
     private boolean isChecked(Board board, int x, int y) {
         // TODO: implement
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "K";
     }
 }

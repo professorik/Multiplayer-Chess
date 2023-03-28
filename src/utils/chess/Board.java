@@ -17,7 +17,7 @@ public class Board {
             Pieces.KNIGHT,
             Pieces.ROOK
     };
-    Spot[][] boxes;
+    Spot[][] boxes = new Spot[STARTING_ROW.length][STARTING_ROW.length];
 
     public Board() {
         this.resetBoard();
@@ -27,7 +27,7 @@ public class Board {
         if (x < 0 || x > 7 || y < 0 || y > 7) {
             throw new Exception("Index out of bound");
         }
-        return boxes[x][y];
+        return boxes[y][x];
     }
 
     public void resetBoard() {
@@ -53,5 +53,17 @@ public class Board {
             case QUEEN -> new Queen(white);
             case KING -> new King(white);
         };
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < boxes.length; i++) {
+            for (int j = 0; j < boxes[i].length; j++) {
+                sb.append(boxes[i][j].toString());
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 }

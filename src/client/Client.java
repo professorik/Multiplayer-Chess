@@ -1,131 +1,30 @@
 package client;
 
-import client.ui.ButtonPanel;
-import utils.cmd.Message;
-import utils.cmd.Move;
-import utils.cmd.Start;
-import utils.cmd.SuggestDraw;
+import client.ui.GUI;
 
-import java.io.*;
-import java.net.Socket;
-import java.util.UUID;
+import javax.swing.*;
+import java.awt.*;
 
-/**
- * @author professorik
- * @created 08/03/2023 - 13:42
- * @project socket-chess
- */
 public class Client {
 
-    private Socket socket;
-    private BufferedReader inputUser;
-    private ObjectOutputStream oos;
-    private ObjectInputStream ois;
-    private final UUID ID;
-    private UUID roomID;
-    private boolean white;
+    public static String ipAddr = "localhost";
+    public static int port = 8080;
+    public static ClientHandler client;
+    public static GUI gui = new GUI();
 
-    public Client(String addr, int port) {
-        ID = UUID.randomUUID();
-        try {
-            socket = new Socket(addr, port);
-        } catch (IOException e) {
-            System.err.println("Socket failed");
-        }
-        try {
-            oos = new ObjectOutputStream(socket.getOutputStream());
-            ois = new ObjectInputStream(socket.getInputStream());
-            inputUser = new BufferedReader(new InputStreamReader(System.in));
-            new ReadMsg().start();
-            new WriteMsg().start();
-        } catch (IOException e) {
-            Client.this.downService();
-        }
-    }
+    public static void main(String[] args) {
+        client = new ClientHandler(ipAddr, port);
 
-    public void start() {
-        sendObj(new Message(ID, "s"));
-    }
-
-    public void move(int from, int to) {
-        sendObj(new Move(ID, white, from, to));
-    }
-
-    private void sendObj(Message msg) {
-        try {
-            oos.writeObject(msg);
-        } catch (IOException ignored) {
-        }
-    }
-
-    private void downService() {
-        if (socket.isClosed()) return;
-        try {
-            socket.close();
-            ois.close();
-            oos.close();
-        } catch (IOException ignored) {
-        }
-    }
-
-    private class ReadMsg extends Thread {
-        @Override
-        public void run() {
-            try {
-                while (true) {
-                    var tmp = ois.readObject();
-                    switch (tmp) {
-                        case Move cmd -> {
-                            if (cmd.isWhite() == white) {
-                                continue;
-                            }
-                            Main.cg.getChessBoard().movePiece(cmd.getFrom(), cmd.getTo());
-                        }
-                        case Start cmd -> {
-                            roomID = cmd.getID();
-                            white = cmd.isWhite();
-                            Main.cg.setupNewGame(white);
-                            Main.cg.setState(ButtonPanel.State.Standard);
-                        }
-                        case SuggestDraw cmd -> {
-                            roomID = cmd.getID();
-                            Main.cg.setState(ButtonPanel.State.Offered);
-                        }
-                        case Message cmd -> {
-                            if (cmd.getMessage().equals("stop")) {
-                                Client.this.downService();
-                                return;
-                            }
-                            System.out.println(cmd.getID() + " " + cmd.getMessage());
-                        }
-                        default -> {}
-                    }
-                }
-            } catch (IOException e) {
-                Client.this.downService();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public class WriteMsg extends Thread {
-
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    String cmd = inputUser.readLine();
-                    sendObj(new Message(ID, cmd));
-
-                    if (cmd.equals("stop")) {
-                        Client.this.downService();
-                        break;
-                    }
-                } catch (IOException e) {
-                    Client.this.downService();
-                }
-            }
-        }
+        Runnable r = () -> {
+            JFrame f = new JFrame("Socket-Chess");
+            f.add(gui.getGUI());
+            f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            f.setLocationByPlatform(true);
+            f.pack();
+            Dimension size = new Dimension(Math.max(f.getWidth(), 1024), Math.max(f.getHeight(), 710));
+            f.setMinimumSize(size);
+            f.setVisible(true);
+        };
+        SwingUtilities.invokeLater(r);
     }
 }

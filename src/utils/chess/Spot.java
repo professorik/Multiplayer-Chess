@@ -16,6 +16,12 @@ public class Spot {
         this.setY(y);
     }
 
+    @Override
+    public String toString() {
+        if (piece == null) return "#";
+        return piece.toString();
+    }
+
     public Piece getPiece() {
         return this.piece;
     }

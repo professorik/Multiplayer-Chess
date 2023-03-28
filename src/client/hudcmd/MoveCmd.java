@@ -1,6 +1,6 @@
-package client.cmd;
+package client.hudcmd;
 
-import client.Client;
+import client.ClientHandler;
 
 /**
  * @author professorik
@@ -12,7 +12,7 @@ public class MoveCmd extends Command {
     private final int from;
     private final int to;
 
-    public MoveCmd(Client client, int from, int to) {
+    public MoveCmd(ClientHandler client, int from, int to) {
         super(client);
         this.from = from;
         this.to = to;

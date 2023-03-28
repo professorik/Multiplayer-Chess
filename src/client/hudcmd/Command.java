@@ -1,6 +1,6 @@
-package client.cmd;
+package client.hudcmd;
 
-import client.Client;
+import client.ClientHandler;
 
 /**
  * @author professorik
@@ -8,9 +8,9 @@ import client.Client;
  * @project socket-chess
  */
 public abstract class Command {
-    public Client client;
+    public ClientHandler client;
 
-    public Command(Client client) {
+    public Command(ClientHandler client) {
         this.client = client;
     }
 

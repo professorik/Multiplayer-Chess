@@ -12,14 +12,14 @@ import java.util.UUID;
  * @created 08/03/2023 - 13:23
  * @project socket-chess
  */
-class ServerSomething extends Thread {
+class ServerHandler extends Thread {
 
     private UUID ID;
     private final Socket socket;
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
 
-    public ServerSomething(Socket socket) throws IOException {
+    public ServerHandler(Socket socket) throws IOException {
         this.socket = socket;
         oos = new ObjectOutputStream(socket.getOutputStream());
         ois = new ObjectInputStream(socket.getInputStream());
@@ -32,7 +32,7 @@ class ServerSomething extends Thread {
             while (true) {
                 var tmp = ois.readObject();
                 if (tmp instanceof Move cmd) {
-                    Server.rooms.get(cmd.getID()).broadcast(cmd);
+                    Server.rooms.get(cmd.getID()).move(cmd);
                     continue;
                 }
                 if (tmp instanceof Message msg) {
@@ -51,7 +51,7 @@ class ServerSomething extends Thread {
             }
         } catch (NullPointerException | IOException e) {
             this.downService();
-        } catch (ClassNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -70,7 +70,7 @@ class ServerSomething extends Thread {
             socket.close();
             ois.close();
             oos.close();
-            for (ServerSomething vr : Server.serverList) {
+            for (ServerHandler vr : Server.serverList) {
                 if (vr.equals(this)) vr.interrupt();
                 Server.serverList.remove(this);
             }

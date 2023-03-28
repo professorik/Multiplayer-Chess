@@ -8,9 +8,9 @@ import java.util.*;
 public class Server {
 
     public static final int PORT = 8080;
-    public static LinkedList<ServerSomething> serverList = new LinkedList<>();
+    public static LinkedList<ServerHandler> serverList = new LinkedList<>();
     public static Story story;
-    public static Queue<ServerSomething> pull = new LinkedList<>();
+    public static Queue<ServerHandler> pull = new LinkedList<>();
     public static Map<UUID, Room> rooms = new HashMap<>();
 
     public static void main(String[] args) throws IOException {
@@ -20,7 +20,7 @@ public class Server {
             while (true) {
                 Socket socket = server.accept();
                 try {
-                   new ServerSomething(socket);
+                   new ServerHandler(socket);
                 } catch (IOException e) {
                     socket.close();
                 }
@@ -28,7 +28,7 @@ public class Server {
         }
     }
 
-    public static void match(ServerSomething member) {
+    public static void match(ServerHandler member) {
         if (pull.isEmpty()) {
             pull.add(member);
             return;

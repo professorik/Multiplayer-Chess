@@ -25,4 +25,9 @@ public class Rook extends Piece {
     public void setMoved(boolean moved) {
         this.moved = moved;
     }
+
+    @Override
+    public String toString() {
+        return "R";
+    }
 }

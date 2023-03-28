@@ -31,4 +31,11 @@ public abstract class Piece {
     }
 
     public abstract boolean canMove(Board board, Spot start, Spot end);
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Piece{");
+        sb.append('}');
+        return sb.toString();
+    }
 }

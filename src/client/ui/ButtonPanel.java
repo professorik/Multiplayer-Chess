@@ -1,10 +1,10 @@
 package client.ui;
 
-import client.Main;
-import client.cmd.Command;
-import client.cmd.DrawCmd;
-import client.cmd.ResignCmd;
-import client.cmd.StartCmd;
+import client.Client;
+import client.hudcmd.Command;
+import client.hudcmd.DrawCmd;
+import client.hudcmd.ResignCmd;
+import client.hudcmd.StartCmd;
 
 import javax.swing.*;
 import java.awt.*;
@@ -63,10 +63,10 @@ public class ButtonPanel extends JPanel {
         add(resign);
         add(acceptDraw);
 
-        start.addActionListener(e -> executeCommand(new StartCmd(Main.client)));
-        draw.addActionListener(e -> executeCommand(new DrawCmd(Main.client)));
-        resign.addActionListener(e -> executeCommand(new ResignCmd(Main.client)));
-        acceptDraw.addActionListener(e -> executeCommand(new DrawCmd(Main.client)));
+        start.addActionListener(e -> executeCommand(new StartCmd(Client.client)));
+        draw.addActionListener(e -> executeCommand(new DrawCmd(Client.client)));
+        resign.addActionListener(e -> executeCommand(new ResignCmd(Client.client)));
+        acceptDraw.addActionListener(e -> executeCommand(new DrawCmd(Client.client)));
 
         setState(State.Initial);
     }

@@ -47,4 +47,8 @@ public class GUI {
     public ChessBoard getChessBoard() {
         return chessBoard;
     }
+
+    public void toggleClocks(boolean isActive) {
+        controlPanel.setClocks(isActive);
+    }
 }

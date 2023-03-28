@@ -1,21 +1,21 @@
-package client.cmd;
+package client.hudcmd;
 
-import client.Client;
+import client.ClientHandler;
 
 /**
  * @author professorik
  * @created 18/03/2023 - 12:18
  * @project socket-chess
  */
-public class DrawCmd extends Command {
+public class ResignCmd extends Command {
 
-    public DrawCmd(Client client) {
+    public ResignCmd(ClientHandler client) {
         super(client);
     }
 
     @Override
     public boolean execute() {
-        System.out.println("draw");
+        System.out.println("resign");
         return false;
     }
 }

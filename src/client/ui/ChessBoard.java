@@ -1,7 +1,7 @@
 package client.ui;
 
-import client.Main;
-import client.cmd.MoveCmd;
+import client.Client;
+import client.hudcmd.MoveCmd;
 import utils.chess.Pieces;
 
 import javax.imageio.ImageIO;
@@ -13,7 +13,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Arrays;
 
 public class ChessBoard extends JPanel implements MouseListener, MouseMotionListener {
 
@@ -106,7 +105,7 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         if (parent == null) {
             parent = getParentByPos(prevX, prevY);
         } else {
-            new MoveCmd(Main.client, getCoordsByPos(prevX, prevY), getCoordsByPos(e.getX(), e.getY())).execute();
+            new MoveCmd(Client.client, getCoordsByPos(prevX, prevY), getCoordsByPos(e.getX(), e.getY())).execute();
             prevX = e.getX();
             prevY = e.getY();
         }
