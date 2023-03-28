@@ -87,7 +87,7 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         Point parentLocation = c.getParent().getLocation();
         xAdj = parentLocation.x - e.getX();
         yAdj = parentLocation.y - e.getY();
-        pieceToMoveButton = (JLabel)c;
+        pieceToMoveButton = (JLabel) c;
         pieceToMoveButton.setLocation(e.getX() + xAdj, e.getY() + yAdj);
         prevX = parentLocation.x;
         prevY = parentLocation.y;
@@ -104,7 +104,7 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         Container parent = getParentByPos(e.getX(), e.getY());
         if (parent == null) {
             parent = getParentByPos(prevX, prevY);
-        } else {
+        } else if (parent != getParentByPos(prevX, prevY)) {
             new MoveCmd(Client.client, getCoordsByPos(prevX, prevY), getCoordsByPos(e.getX(), e.getY())).execute();
             prevX = e.getX();
             prevY = e.getY();
@@ -113,13 +113,28 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         putCentered(pieceToMoveButton, parent);
     }
 
+    private void printDesk() {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                System.out.print(chessBoardSquares[j][i].getComponents().length + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+
     public void movePiece(int from, int to) {
         int f_x = from / 8, f_y = from % 8;
         int t_x = to / 8, t_y = to % 8;
-        var ptm = (JLabel) chessBoardSquares[f_x][f_y].getComponent(0);
-        chessBoardSquares[f_x][f_y].remove(0);
-        if (chessBoardSquares[t_x][t_y].getComponents().length > 0) {
-            chessBoardSquares[t_x][t_y].remove(0);
+        int index = chessBoardSquares[f_x][f_y].getComponents().length - 1;
+        var ptm = (JLabel) chessBoardSquares[f_x][f_y].getComponent(index);
+        chessBoardSquares[f_x][f_y].remove(ptm);
+
+        int tmp = 0;
+        if (t_x == 0) ++tmp;
+        if (t_y == 7) ++tmp;
+        if (chessBoardSquares[t_x][t_y].getComponents().length > tmp) {
+            chessBoardSquares[t_x][t_y].remove(chessBoardSquares[t_x][t_y].getComponents().length - 1);
         }
         ptm.setVisible(true);
         putCentered(ptm, chessBoardSquares[t_x][t_y]);
@@ -135,9 +150,8 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
     private Container getParentByPos(int x, int y) {
         Component c = chessBoard.findComponentAt(x, y);
         Container parent;
-        if (c instanceof JLabel){
+        if (c instanceof JLabel) {
             parent = c.getParent();
-            parent.remove(0);
         } else {
             parent = (Container) c;
         }
@@ -147,20 +161,20 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
     private int getCoordsByPos(int x, int y) {
         Component c = chessBoard.findComponentAt(x, y);
         Container parent = (Container) c;
-        if (c instanceof JLabel){
+        if (c instanceof JLabel) {
             parent = c.getParent();
         }
         for (int i = 0; i < chessBoardSquares.length; i++) {
             for (int j = 0; j < chessBoardSquares.length; j++) {
                 if (chessBoardSquares[i][j] == parent) {
-                    return 63 - i*8 - j;
+                    return 63 - i * 8 - j;
                 }
             }
         }
         return -1;
     }
 
-    private void addButtons(){
+    private void addButtons() {
         for (int i = 0; i < chessBoardSquares.length; i++) {
             for (int j = 0; j < chessBoardSquares[i].length; j++) {
                 JPanel square = new JPanel(new SpringLayout());
@@ -175,14 +189,14 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         }
     }
 
-    private void addLabels(){
+    private void addLabels() {
         for (int i = 0; i < chessBoardSquares.length; i++) {
-            JLabel column = new JLabel(String.valueOf((char) (white? (int) 'a' + i: (int) 'h' - i)));
-            column.setForeground(i % 2 == 0? WHITE: BLACK);
+            JLabel column = new JLabel(String.valueOf((char) (white ? (int) 'a' + i : (int) 'h' - i)));
+            column.setForeground(i % 2 == 0 ? WHITE : BLACK);
             putBottomRight(column, chessBoardSquares[i][chessBoardSquares.length - 1]);
 
-            JLabel row = new JLabel(String.valueOf(white? 8 - i: i + 1));
-            row.setForeground(i % 2 == 1? WHITE: BLACK);
+            JLabel row = new JLabel(String.valueOf(white ? 8 - i : i + 1));
+            row.setForeground(i % 2 == 1 ? WHITE : BLACK);
             putTopLeft(row, chessBoardSquares[0][i]);
         }
     }
