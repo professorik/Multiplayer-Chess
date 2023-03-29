@@ -42,11 +42,16 @@ public class ControlPanel extends JPanel {
 
     protected void setClocks(boolean isLower) {
         if (isLower) {
-            lower.start();
             upper.stop();
+            lower.start();
         } else {
-            lower.stop();
             upper.start();
+            lower.stop();
         }
+    }
+
+    protected void stopClocks() {
+        upper.stop();
+        lower.stop();
     }
 }

@@ -52,4 +52,8 @@ public class GUI {
         controlPanel.setClocks(isActive);
         chessBoard.setTurn(isActive);
     }
+
+    public void stopClocks() {
+        controlPanel.stopClocks();
+    }
 }

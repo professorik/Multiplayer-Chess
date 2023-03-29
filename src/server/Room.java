@@ -2,14 +2,9 @@ package server;
 
 import utils.chess.Game;
 import utils.chess.Player;
-import utils.cmd.Message;
-import utils.cmd.Move;
-import utils.cmd.Start;
+import utils.cmd.*;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author professorik
@@ -21,6 +16,7 @@ public class Room {
     private final UUID ID;
     private final LinkedList<ServerHandler> users = new LinkedList<>();
     private final Map<UUID, Player> userToPlayer = new HashMap<>();
+    private final HashSet<UUID> drawPool = new HashSet<>();
     private final Game game;
 
     public Room() {
@@ -46,10 +42,6 @@ public class Room {
         int startX = move.getFrom() / 8, startY = move.getFrom() % 8;
         int endX = move.getTo() / 8, endY = move.getTo() % 8;
 
-        System.out.println(startX + " " + startY + " " + endX + " " + endY);
-
-        System.out.println(userToPlayer.containsKey(move.getID()));
-
         if (!userToPlayer.get(move.getID()).whiteSide) {
             startY = 7 - startY;
             endY = 7 - endY;
@@ -57,8 +49,6 @@ public class Room {
             startX = 7 - startX;
             endX = 7 - endX;
         }
-
-        System.out.println(startX + " " + startY + " " + endX + " " + endY);
 
         boolean fl = game.playerMove(userToPlayer.get(move.getID()), startX, startY, endX, endY);
         if (!fl) {
@@ -70,10 +60,33 @@ public class Room {
         }
     }
 
+    protected void draw(SuggestDraw cmd) {
+        drawPool.add(cmd.getID());
+        if (drawPool.size() == 2) {
+            broadcast(new Finish(ID, true, true));
+            return;
+        }
+        broadcastTargeted(cmd);
+    }
+
+    protected void decline(DeclineDraw cmd) {
+        drawPool.clear();
+        broadcastTargeted(cmd);
+    }
+
     protected void broadcast(Message msg) {
         msg.setID(ID);
         for (ServerHandler vr: users) {
             vr.sendObj(msg);
+        }
+    }
+
+    protected void broadcastTargeted(Message msg) {
+        var id = msg.getID();
+        msg.setID(ID);
+        for (ServerHandler vr: users) {
+            if (vr.getID() != id)
+                vr.sendObj(msg);
         }
     }
 }

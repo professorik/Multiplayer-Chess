@@ -1,7 +1,9 @@
 package server;
 
+import utils.cmd.DeclineDraw;
 import utils.cmd.Message;
 import utils.cmd.Move;
+import utils.cmd.SuggestDraw;
 
 import java.io.*;
 import java.net.Socket;
@@ -33,6 +35,14 @@ class ServerHandler extends Thread {
                 var tmp = ois.readObject();
                 if (tmp instanceof Move cmd) {
                     Server.rooms.get(cmd.getID()).move(cmd);
+                    continue;
+                }
+                if (tmp instanceof SuggestDraw cmd) {
+                    Server.rooms.get(cmd.getID()).draw(cmd);
+                    continue;
+                }
+                if (tmp instanceof DeclineDraw cmd) {
+                    Server.rooms.get(cmd.getID()).decline(cmd);
                     continue;
                 }
                 if (tmp instanceof Message msg) {

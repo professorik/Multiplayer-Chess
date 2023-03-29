@@ -1,10 +1,7 @@
 package client;
 
 import client.ui.ButtonPanel;
-import utils.cmd.Message;
-import utils.cmd.Move;
-import utils.cmd.Start;
-import utils.cmd.SuggestDraw;
+import utils.cmd.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -58,7 +55,7 @@ public class ClientHandler {
     }
 
     public void declineDraw() {
-        sendObj(new Message(ID, "d"));
+        sendObj(new DeclineDraw(ID));
     }
 
     private void sendObj(Message msg) {
@@ -104,6 +101,12 @@ public class ClientHandler {
                         case SuggestDraw cmd -> {
                             roomID = cmd.getID();
                             Client.gui.setState(ButtonPanel.State.Offered);
+                        }
+                        case DeclineDraw ignored -> Client.gui.setState(ButtonPanel.State.Standard);
+                        case Finish cmd -> {
+                            System.out.println("END!!! " + cmd.isWhite() + " / " + cmd.isBlack());
+                            Client.gui.stopClocks();
+                            Client.gui.setState(ButtonPanel.State.Initial);
                         }
                         case Message cmd -> {
                             if (cmd.getMessage().equals("stop")) {
