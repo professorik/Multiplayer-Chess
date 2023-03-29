@@ -1,10 +1,6 @@
 package client.ui;
 
 import client.Client;
-import client.hudcmd.Command;
-import client.hudcmd.DrawCmd;
-import client.hudcmd.ResignCmd;
-import client.hudcmd.StartCmd;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,16 +16,18 @@ public class ButtonPanel extends JPanel {
 
     private final JButton start = new FlatButton("Play");
     private final JButton draw = new FlatButton("Draw");
-    private final JButton acceptDraw = new FlatButton("Accept");
+    private final JButton declineDraw = new FlatButton("Decline");
     private final JButton resign = new FlatButton("Resign");
 
     public enum State {
         Initial {
             @Override
             public void show(ButtonPanel panel) {
+                panel.start.setText("Play");
                 panel.start.setVisible(true);
+
                 panel.draw.setVisible(false);
-                panel.acceptDraw.setVisible(false);
+                panel.declineDraw.setVisible(false);
                 panel.resign.setVisible(false);
             }
         },
@@ -37,8 +35,12 @@ public class ButtonPanel extends JPanel {
             @Override
             public void show(ButtonPanel panel) {
                 panel.start.setVisible(false);
+
+                panel.draw.setText("Draw");
                 panel.draw.setVisible(true);
-                panel.acceptDraw.setVisible(false);
+                panel.draw.setEnabled(true);
+
+                panel.declineDraw.setVisible(false);
                 panel.resign.setVisible(true);
             }
         },
@@ -46,8 +48,11 @@ public class ButtonPanel extends JPanel {
             @Override
             public void show(ButtonPanel panel) {
                 panel.start.setVisible(false);
-                panel.draw.setVisible(false);
-                panel.acceptDraw.setVisible(true);
+
+                panel.draw.setText("Accept");
+                panel.draw.setVisible(true);
+
+                panel.declineDraw.setVisible(true);
                 panel.resign.setVisible(true);
             }
         };
@@ -61,20 +66,31 @@ public class ButtonPanel extends JPanel {
         add(start);
         add(draw);
         add(resign);
-        add(acceptDraw);
+        add(declineDraw);
 
-        start.addActionListener(e -> executeCommand(new StartCmd(Client.client)));
-        draw.addActionListener(e -> executeCommand(new DrawCmd(Client.client)));
-        resign.addActionListener(e -> executeCommand(new ResignCmd(Client.client)));
-        acceptDraw.addActionListener(e -> executeCommand(new DrawCmd(Client.client)));
+        start.addActionListener(e -> onStartPressed());
+        draw.addActionListener(e -> onDrawPressed());
+        resign.addActionListener(e -> Client.client.resign());
+        declineDraw.addActionListener(e -> onDeclineDrawPressed());
 
         setState(State.Initial);
     }
 
-    private void executeCommand(Command command) {
-        if (command.execute()) {
-            System.out.println("Success");
+    private void onStartPressed() {
+        start.setText("Searching...");
+        Client.client.start();
+    }
+
+    private void onDrawPressed() {
+        if (draw.getText().equals("Draw")) {
+            draw.setEnabled(false);
         }
+        Client.client.suggestDraw();
+    }
+
+    private void onDeclineDrawPressed() {
+        setState(State.Standard);
+        Client.client.declineDraw();
     }
 
     public void setState(State state) {

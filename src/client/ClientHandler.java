@@ -18,7 +18,6 @@ import java.util.UUID;
 public class ClientHandler {
 
     private Socket socket;
-    private BufferedReader inputUser;
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
     private final UUID ID;
@@ -36,9 +35,7 @@ public class ClientHandler {
         try {
             oos = new ObjectOutputStream(socket.getOutputStream());
             ois = new ObjectInputStream(socket.getInputStream());
-            inputUser = new BufferedReader(new InputStreamReader(System.in));
             new ReadMsg().start();
-            new WriteMsg().start();
         } catch (IOException e) {
             ClientHandler.this.downService();
         }
@@ -52,8 +49,16 @@ public class ClientHandler {
         if (turn) sendObj(new Move(ID, white, from, to));
     }
 
+    public void resign() {
+        sendObj(new Message(ID, "r"));
+    }
+
     public void suggestDraw() {
         sendObj(new SuggestDraw(ID, white));
+    }
+
+    public void declineDraw() {
+        sendObj(new Message(ID, "d"));
     }
 
     private void sendObj(Message msg) {
@@ -114,26 +119,6 @@ public class ClientHandler {
                 ClientHandler.this.downService();
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
-            }
-        }
-    }
-
-    public class WriteMsg extends Thread {
-
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    String cmd = inputUser.readLine();
-                    sendObj(new Message(ID, cmd));
-
-                    if (cmd.equals("stop")) {
-                        ClientHandler.this.downService();
-                        break;
-                    }
-                } catch (IOException e) {
-                    ClientHandler.this.downService();
-                }
             }
         }
     }
