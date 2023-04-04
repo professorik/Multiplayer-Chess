@@ -39,6 +39,11 @@ public class Clock extends JPanel {
         });
     }
 
+    public void setSecs(int secs) {
+        this.secs = secs;
+        label.setText(format(this.secs));
+    }
+
     protected void start() {
         timer.start();
     }

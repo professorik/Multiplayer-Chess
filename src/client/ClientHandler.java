@@ -1,6 +1,7 @@
 package client;
 
 import client.ui.ButtonPanel;
+import client.ui.Popup;
 import utils.cmd.*;
 
 import java.io.*;
@@ -104,9 +105,9 @@ public class ClientHandler {
                         }
                         case DeclineDraw ignored -> Client.gui.setState(ButtonPanel.State.Standard);
                         case Finish cmd -> {
-                            System.out.println("END!!! " + cmd.isWhite() + " / " + cmd.isBlack() + " / " + cmd.getReason());
                             Client.gui.stopClocks();
                             Client.gui.setState(ButtonPanel.State.Initial);
+                            Popup.finish(cmd.getReason(), cmd.isWhite(), cmd.isBlack(), Client.client.white);
                         }
                         case Message cmd -> {
                             if (cmd.getMessage().equals("stop")) {

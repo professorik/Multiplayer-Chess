@@ -9,13 +9,11 @@ public class Server {
 
     public static final int PORT = 8080;
     public static LinkedList<ServerHandler> serverList = new LinkedList<>();
-    public static Story story;
     public static Queue<ServerHandler> pull = new LinkedList<>();
     public static Map<UUID, Room> rooms = new HashMap<>();
 
     public static void main(String[] args) throws IOException {
         try (ServerSocket server = new ServerSocket(PORT)) {
-            story = new Story();
             System.out.println("Server Started");
             while (true) {
                 Socket socket = server.accept();

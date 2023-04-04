@@ -63,7 +63,8 @@ public class Room {
     protected void draw(SuggestDraw cmd) {
         drawPool.add(cmd.getID());
         if (drawPool.size() == 2) {
-            broadcast(new Finish(ID, true, true));
+            broadcast(new Finish(ID, true, true, Finish.Reason.AGREEMENT));
+            destruct();
             return;
         }
         broadcastTargeted(cmd);
@@ -77,6 +78,7 @@ public class Room {
     protected void resign(Resign cmd) {
         var user = userToPlayer.get(cmd.getID());
         broadcast(new Finish(ID, !user.whiteSide, user.whiteSide, Finish.Reason.RESIGNATION));
+        destruct();
     }
 
     protected void broadcast(Message msg) {
@@ -92,6 +94,12 @@ public class Room {
         for (ServerHandler vr: users) {
             if (vr.getID() != id)
                 vr.sendObj(msg);
+        }
+    }
+
+    private void destruct() {
+        for (UUID id: userToPlayer.keySet()) {
+            Server.rooms.remove(id);
         }
     }
 }

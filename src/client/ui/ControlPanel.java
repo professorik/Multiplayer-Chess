@@ -54,4 +54,9 @@ public class ControlPanel extends JPanel {
         upper.stop();
         lower.stop();
     }
+
+    protected void resetClocks() {
+        upper.setSecs(300);
+        lower.setSecs(300);
+    }
 }

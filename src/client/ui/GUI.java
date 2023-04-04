@@ -42,6 +42,7 @@ public class GUI {
         chessBoard = new ChessBoard(white);
         chessBoard.setBorder(null);
         GUI.add(chessBoard, BorderLayout.WEST);
+        controlPanel.resetClocks();
     }
 
     public ChessBoard getChessBoard() {

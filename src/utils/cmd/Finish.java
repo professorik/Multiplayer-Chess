@@ -13,6 +13,7 @@ public class Finish extends Message {
         MATE,
         STALEMATE,
         RESIGNATION,
+        AGREEMENT,
     }
 
     private final boolean isWhite;
@@ -33,6 +34,7 @@ public class Finish extends Message {
             case MATE -> this.reason = tmp + " won by mate";
             case STALEMATE -> this.reason = "Stalemate";
             case RESIGNATION -> this.reason = tmp + " won by resignation";
+            case AGREEMENT -> this.reason = "By agreement";
         }
     }
 

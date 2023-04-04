@@ -56,7 +56,6 @@ public class ButtonPanel extends JPanel {
                 panel.resign.setVisible(true);
 
                 Timer timer = new Timer(15_000, e -> {
-                    System.out.println("timer");
                     if (panel.declineDraw.isVisible()) {
                         panel.onDeclineDrawPressed();
                     }
