@@ -74,6 +74,11 @@ public class Room {
         broadcastTargeted(cmd);
     }
 
+    protected void resign(Resign cmd) {
+        var user = userToPlayer.get(cmd.getID());
+        broadcast(new Finish(ID, !user.whiteSide, user.whiteSide, Finish.Reason.RESIGNATION));
+    }
+
     protected void broadcast(Message msg) {
         msg.setID(ID);
         for (ServerHandler vr: users) {

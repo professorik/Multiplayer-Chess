@@ -47,7 +47,7 @@ public class ClientHandler {
     }
 
     public void resign() {
-        sendObj(new Message(ID, "r"));
+        sendObj(new Resign(ID));
     }
 
     public void suggestDraw() {
@@ -104,7 +104,7 @@ public class ClientHandler {
                         }
                         case DeclineDraw ignored -> Client.gui.setState(ButtonPanel.State.Standard);
                         case Finish cmd -> {
-                            System.out.println("END!!! " + cmd.isWhite() + " / " + cmd.isBlack());
+                            System.out.println("END!!! " + cmd.isWhite() + " / " + cmd.isBlack() + " / " + cmd.getReason());
                             Client.gui.stopClocks();
                             Client.gui.setState(ButtonPanel.State.Initial);
                         }

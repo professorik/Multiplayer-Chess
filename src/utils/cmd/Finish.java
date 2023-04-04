@@ -9,13 +9,31 @@ import java.util.UUID;
  */
 public class Finish extends Message {
 
+    public enum Reason {
+        MATE,
+        STALEMATE,
+        RESIGNATION,
+    }
+
     private final boolean isWhite;
     private final boolean isBlack;
+    private String reason;
 
     public Finish(UUID ID, boolean isWhite, boolean isBlack) {
         super(ID, "F");
         this.isWhite = isWhite;
         this.isBlack = isBlack;
+        this.reason = "";
+    }
+
+    public Finish(UUID ID, boolean isWhite, boolean isBlack, Reason reason) {
+        this(ID, isWhite, isBlack);
+        String tmp = isWhite? "White": "Black";
+        switch (reason) {
+            case MATE -> this.reason = tmp + " won by mate";
+            case STALEMATE -> this.reason = "Stalemate";
+            case RESIGNATION -> this.reason = tmp + " won by resignation";
+        }
     }
 
     public boolean isWhite() {
@@ -24,5 +42,9 @@ public class Finish extends Message {
 
     public boolean isBlack() {
         return isBlack;
+    }
+
+    public String getReason() {
+        return reason;
     }
 }

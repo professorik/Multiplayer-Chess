@@ -1,9 +1,6 @@
 package server;
 
-import utils.cmd.DeclineDraw;
-import utils.cmd.Message;
-import utils.cmd.Move;
-import utils.cmd.SuggestDraw;
+import utils.cmd.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -33,30 +30,25 @@ class ServerHandler extends Thread {
         try {
             while (true) {
                 var tmp = ois.readObject();
-                if (tmp instanceof Move cmd) {
-                    Server.rooms.get(cmd.getID()).move(cmd);
-                    continue;
-                }
-                if (tmp instanceof SuggestDraw cmd) {
-                    Server.rooms.get(cmd.getID()).draw(cmd);
-                    continue;
-                }
-                if (tmp instanceof DeclineDraw cmd) {
-                    Server.rooms.get(cmd.getID()).decline(cmd);
-                    continue;
-                }
-                if (tmp instanceof Message msg) {
-                    if (msg.getMessage().equals("stop")) {
-                        this.downService();
-                        return;
+                switch (tmp) {
+                    case Move cmd -> Server.rooms.get(cmd.getID()).move(cmd);
+                    case SuggestDraw cmd -> Server.rooms.get(cmd.getID()).draw(cmd);
+                    case DeclineDraw cmd -> Server.rooms.get(cmd.getID()).decline(cmd);
+                    case Resign cmd -> Server.rooms.get(cmd.getID()).resign(cmd);
+                    case Message msg -> {
+                        if (msg.getMessage().equals("stop")) {
+                            this.downService();
+                            return;
+                        }
+                        if (msg.getMessage().equals("s")) {
+                            ID = msg.getID();
+                            Server.match(this);
+                            continue;
+                        }
+                        System.out.println(msg.getID() + " " + msg.getMessage());
+                        Server.rooms.get(msg.getID()).broadcast(msg);
                     }
-                    if (msg.getMessage().equals("s")) {
-                        ID = msg.getID();
-                        Server.match(this);
-                        continue;
-                    }
-                    System.out.println(msg.getID() + " " + msg.getMessage());
-                    Server.rooms.get(msg.getID()).broadcast(msg);
+                    default -> throw new IllegalStateException("Unexpected value: " + tmp);
                 }
             }
         } catch (NullPointerException | IOException e) {
