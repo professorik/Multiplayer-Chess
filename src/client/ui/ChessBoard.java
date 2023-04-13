@@ -127,16 +127,16 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
     }
 
     public void movePiece(int from, int to) {
-        int f_x = from / 8, f_y = from % 8;
-        int t_x = to / 8, t_y = to % 8;
-        var ptm = (JLabel) piecesSquares[f_x][f_y].getComponent(0);
-        piecesSquares[f_x][f_y].remove(0);
+        int f_y = from / 8, f_x = from % 8;
+        int t_y = to / 8, t_x = to % 8;
+        var ptm = (JLabel) piecesSquares[f_y][f_x].getComponent(0);
+        piecesSquares[f_y][f_x].remove(0);
 
-        if (piecesSquares[t_x][t_y].getComponents().length > 0) {
-            piecesSquares[t_x][t_y].remove(0);
+        if (piecesSquares[t_y][t_x].getComponents().length > 0) {
+            piecesSquares[t_y][t_x].remove(0);
         }
         ptm.setVisible(true);
-        putCentered(ptm, piecesSquares[t_x][t_y]);
+        putCentered(ptm, piecesSquares[t_y][t_x]);
         repaint();
     }
 
@@ -174,6 +174,12 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         return parent;
     }
 
+    /**
+     * @param x
+     * @param y
+     * @return cell index, i.e. 8*row + column
+     * Returns the cell index for the opponent, i.e. rotated by 180 degrees
+     */
     private int getCoordsByPos(int x, int y) {
         Component c = pieces.findComponentAt(x, y);
         Container parent = (Container) c;

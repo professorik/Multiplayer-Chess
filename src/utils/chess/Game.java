@@ -50,14 +50,14 @@ public class Game {
 
     private boolean makeMove(Move move, Player player) {
         try {
-            System.out.println(player.whiteSide + " " + move.getStart().getX() + " " + move.getStart().getY() + " " + move.getEnd().getX() + " " + move.getEnd().getY());
+            System.out.println(player.whiteSide + " " + move.getStart().getY() + " " + move.getStart().getX() + " " + move.getEnd().getY() + " " + move.getEnd().getX());
             if (player != currentTurn) return false;
 
             Piece sourcePiece = move.getStart().getPiece();
             if (sourcePiece == null || sourcePiece.isWhite() != player.isWhiteSide()) return false;
             if (!sourcePiece.canMove(board, move.getStart(), move.getEnd())) return false;
 
-            Piece destPiece = move.getStart().getPiece();
+            Piece destPiece = move.getEnd().getPiece();
             if (destPiece != null) {
                 destPiece.setKilled(true);
                 move.setPieceKilled(destPiece);

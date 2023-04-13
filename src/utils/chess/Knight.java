@@ -19,8 +19,8 @@ public class Knight extends Piece {
             return false;
         }
 
-        int x = Math.abs(start.getX() - end.getX());
-        int y = Math.abs(start.getY() - end.getY());
+        int x = Math.abs(start.getY() - end.getY());
+        int y = Math.abs(start.getX() - end.getX());
         return x * y == 2;
     }
 

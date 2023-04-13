@@ -52,10 +52,12 @@ public class Room {
 
         boolean fl = game.playerMove(userToPlayer.get(move.getID()), startX, startY, endX, endY);
         if (!fl) {
-            System.out.println("error");
+            broadcastMirror(new ServerMove(move, false, ""));
+            return;
         }
-        broadcast(move);
+        broadcast(new ServerMove(move, true, ""));
         if (game.isEnd()) {
+            //FIXME: use Finish
             broadcast(new Message(ID, game.getStatus().name()));
         }
     }
@@ -67,12 +69,12 @@ public class Room {
             destruct();
             return;
         }
-        broadcastTargeted(cmd);
+        broadcastExclusive(cmd);
     }
 
     protected void decline(DeclineDraw cmd) {
         drawPool.clear();
-        broadcastTargeted(cmd);
+        broadcastExclusive(cmd);
     }
 
     protected void resign(Resign cmd) {
@@ -88,7 +90,16 @@ public class Room {
         }
     }
 
-    protected void broadcastTargeted(Message msg) {
+    protected void broadcastMirror(Message msg) {
+        for (ServerHandler vr: users) {
+            if (vr.getID() == msg.getID()) {
+                vr.sendObj(msg);
+                return;
+            }
+        }
+    }
+
+    protected void broadcastExclusive(Message msg) {
         var id = msg.getID();
         msg.setID(ID);
         for (ServerHandler vr: users) {

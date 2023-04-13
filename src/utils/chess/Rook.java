@@ -15,7 +15,7 @@ public class Rook extends Piece {
 
     @Override
     public boolean canMove(Board board, Spot start, Spot end) {
-        return false;
+        return true;
     }
 
     public boolean isMoved() {
