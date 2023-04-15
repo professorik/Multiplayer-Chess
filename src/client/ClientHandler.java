@@ -47,6 +47,10 @@ public class ClientHandler {
         if (turn) sendObj(new Move(ID, white, from, to));
     }
 
+    public void move(int from, int to, int fx, int fy, int tx, int ty) {
+        if (turn) sendObj(new Move(ID, white, from, to, fx, fy, tx, ty));
+    }
+
     public void resign() {
         sendObj(new Resign(ID));
     }
@@ -84,7 +88,6 @@ public class ClientHandler {
                     var tmp = ois.readObject();
                     switch (tmp) {
                         case ServerMove cmd -> {
-                            System.out.println(cmd.getID() + " " + ID + " " + cmd.getFrom() + " " + cmd.getTo());
                             if (cmd.isSuccess()) {
                                 turn = !turn;
                                 Client.gui.toggleClocks(turn);
@@ -92,7 +95,7 @@ public class ClientHandler {
                                 Client.gui.getChessBoard().movePiece(cmd.getFrom(), cmd.getTo());
                                 continue;
                             }
-                            System.out.println("FAILED " + (63 - cmd.getTo()) + " " + (63 - cmd.getFrom()));
+                            System.out.println("FAILED " + (63 - cmd.getTo()) + " " + (63 - cmd.getFrom()) + " " + cmd.getF() + " " + cmd.getT());
                             Client.gui.getChessBoard().movePiece(63 - cmd.getTo(), 63 - cmd.getFrom());
                         }
                         case Start cmd -> {
