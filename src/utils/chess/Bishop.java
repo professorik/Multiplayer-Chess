@@ -12,6 +12,8 @@ public class Bishop extends Piece {
 
     @Override
     public boolean canMove(Board board, Spot start, Spot end) {
+        if (isTaken(end)) return false;
+
         int dy = end.getY() - start.getY(), dx = end.getX() - start.getX();
         int pdy = Math.abs(dy), pdx = Math.abs(dx);
 

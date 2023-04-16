@@ -32,6 +32,10 @@ public abstract class Piece {
 
     public abstract boolean canMove(Board board, Spot start, Spot end);
 
+    protected boolean isTaken(Spot spot) {
+        return spot.getPiece() != null && spot.getPiece().isWhite() == this.isWhite();
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("Piece{");

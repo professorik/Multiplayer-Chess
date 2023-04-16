@@ -23,11 +23,11 @@ public class King extends Piece {
 
     @Override
     public boolean canMove(Board board, Spot start, Spot end) {
-        if (end.getPiece() != null && end.getPiece().isWhite() == this.isWhite()) return false;
+        if (isTaken(end)) return false;
 
         int x = Math.abs(start.getY() - end.getY());
         int y = Math.abs(start.getX() - end.getX());
-        if (x + y == 1) return true;
+        if (x < 2 && y < 2) return x + y != 0;
 
         return this.isValidCastling(board, start, end);
     }

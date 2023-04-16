@@ -43,4 +43,19 @@ public class Move {
     public Spot getEnd() {
         return end;
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Move{");
+        sb.append("player=").append(player);
+        sb.append(", start=").append(start);
+        sb.append(", end=").append(end);
+        sb.append(String.format(", start_c=(%d,%d)", getStart().getX(), getStart().getY()));
+        sb.append(String.format(", end_c=(%d,%d)", getEnd().getX(), getEnd().getY()));
+        sb.append(", pieceMoved=").append(pieceMoved);
+        sb.append(", pieceKilled=").append(pieceKilled);
+        sb.append(", castlingMove=").append(castlingMove);
+        sb.append('}');
+        return sb.toString();
+    }
 }

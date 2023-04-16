@@ -6,13 +6,19 @@ package utils.chess;
  * @project socket-chess
  */
 public class Queen extends Piece {
+
+    private final Bishop bishop;
+    private final Rook rook;
+
     public Queen(boolean white) {
         super(white);
+        bishop = new Bishop(white);
+        rook = new Rook(white);
     }
 
     @Override
     public boolean canMove(Board board, Spot start, Spot end) {
-        return true;
+        return bishop.canMove(board, start, end) || rook.canMove(board, start, end);
     }
 
     @Override

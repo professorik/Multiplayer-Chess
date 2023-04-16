@@ -50,7 +50,7 @@ public class Game {
 
     private boolean makeMove(Move move, Player player) {
         try {
-            System.out.println(player.whiteSide + " " + move.getStart().getY() + " " + move.getStart().getX() + " " + move.getEnd().getY() + " " + move.getEnd().getX());
+            System.out.println(player.whiteSide + " " + move);
             if (player != currentTurn) return false;
 
             Piece sourcePiece = move.getStart().getPiece();
