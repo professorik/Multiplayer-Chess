@@ -38,14 +38,4 @@ public class ServerMove extends Move {
     public int[][] getBoard() {
         return board;
     }
-
-    /*@Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("SM{");
-        sb.append("s=").append(success);
-        sb.append(", l='").append(label).append('\'');
-        sb.append(", b=").append(board == null ? "null" : Arrays.asList(board).toString());
-        sb.append('}');
-        return sb.toString();
-    }*/
 }

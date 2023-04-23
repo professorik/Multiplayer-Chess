@@ -180,15 +180,6 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         putCenteredAndRepaint(ptm, piecesSquares[to.r][to.c]);
     }
 
-    private void printTable(){
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                System.out.print(piecesSquares[i][j].getComponents().length + " ");
-            }
-            System.out.println();
-        }
-    }
-
     private Container getParentByPos(int x, int y) {
         Component c = pieces.findComponentAt(x, y);
         Container parent;
@@ -198,28 +189,6 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
             parent = (Container) c;
         }
         return parent;
-    }
-
-    /**
-     * @param x
-     * @param y
-     * @return cell index, i.e. 8*row + column
-     * Returns the cell index for the opponent, i.e. rotated by 180 degrees
-     */
-    private int getCoordsByPos(int x, int y) {
-        Component c = pieces.findComponentAt(x, y);
-        Container parent = (Container) c;
-        if (c instanceof JLabel) {
-            parent = c.getParent();
-        }
-        for (int i = 0; i < piecesSquares.length; i++) {
-            for (int j = 0; j < piecesSquares[i].length; j++) {
-                if (piecesSquares[i][j] == parent) {
-                    return 63 - i * 8 - j;
-                }
-            }
-        }
-        return -1;
     }
 
     private Coord getCoordByPos(int x, int y) {

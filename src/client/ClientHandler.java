@@ -44,10 +44,6 @@ public class ClientHandler {
         sendObj(new Message(ID, "s"));
     }
 
-    public void move(int from, int to) {
-        if (turn) sendObj(new Move(ID, white, from, to));
-    }
-
     public void move(Coord f, Coord t) {
         if (turn) sendObj(new Move(ID, white, -1, -1, f, t));
     }
@@ -100,12 +96,9 @@ public class ClientHandler {
                             if (cmd.isSuccess()) {
                                 turn = !turn;
                                 Client.gui.toggleClocks(turn);
-                                //if (cmd.isWhite() == white) continue;
-                                //Client.gui.getChessBoard().movePiece(cmd.getFrom(), cmd.getTo());
-                                continue;
+                            } else {
+                                System.out.println("FAILED " + cmd.getF() + " " + cmd.getT());
                             }
-                            System.out.println("FAILED " + cmd.getF() + " " + cmd.getT());
-                            //Client.gui.getChessBoard().movePiece(63 - cmd.getTo(), 63 - cmd.getFrom());
                         }
                         case Start cmd -> {
                             roomID = cmd.getID();

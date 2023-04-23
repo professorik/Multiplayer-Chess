@@ -1,5 +1,7 @@
 package utils.chess;
 
+import utils.Coord;
+
 /**
  * @author professorik
  * @created 11/03/2023 - 20:49
@@ -7,13 +9,11 @@ package utils.chess;
  */
 public class Spot {
     private Piece piece;
-    private int x;
-    private int y;
+    private final Coord coord;
 
-    public Spot(int y, int x, Piece piece) {
+    public Spot(int r, int c, Piece piece) {
         this.setPiece(piece);
-        this.setX(x);
-        this.setY(y);
+        this.coord = new Coord(r, c);
     }
 
     @Override
@@ -30,20 +30,16 @@ public class Spot {
         this.piece = p;
     }
 
-    public int getY() {
-        return this.y;
+    public Coord getCoord() {
+        return coord;
     }
 
-    public void setX(int x) {
-        this.x = x;
+    public int getY() {
+        return this.coord.r;
     }
 
     public int getX() {
-        return this.x;
-    }
-
-    public void setY(int y) {
-        this.y = y;
+        return this.coord.c;
     }
 }
 

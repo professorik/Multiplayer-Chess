@@ -25,6 +25,16 @@ public class Coord implements Serializable {
         c = 7 - c;
     }
 
+    public Coord getOrientation(Coord dest) {
+        int dr = dest.r - r, dc = dest.c - c;
+        int pdr = Math.abs(dr), pdc = Math.abs(dc);
+
+        if (pdr != 0) dr /= pdr;
+        if (pdc != 0) dc /= pdc;
+
+        return new Coord(dr, dc);
+    }
+
     @Override
     public String toString() {
         return "(" + r + ", " + c + ")";
