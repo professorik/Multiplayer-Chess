@@ -39,13 +39,16 @@ public class Room {
     }
 
     protected void move(Move move) throws Exception {
-        int startC = move.getF().getC(), startR = move.getF().getR();
-        int endC = move.getT().getC(), endR = move.getT().getR();
+        int startC = move.getF().c, startR = move.getF().r;
+        int endC = move.getT().c, endR = move.getT().r;
         if (userToPlayer.get(move.getID()).whiteSide) {
             startR = 7 - startR;
             endR = 7 - endR;
+        } else {
+            startC = 7 - startC;
+            endC = 7 - endC;
         }
-        System.out.println(startC + " " + startR + " " + endC + " " + endR + " " + move.getF() + " " + move.getT());
+        System.out.println(startR + " " + startC + " " + endR + " " + endC + " " + move.getF() + " " + move.getT());
 
         boolean fl = game.playerMove(userToPlayer.get(move.getID()), startC, startR, endC, endR);
         if (!fl) {

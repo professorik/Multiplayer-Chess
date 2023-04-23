@@ -1,5 +1,7 @@
 package utils.cmd;
 
+import utils.Coord;
+
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -15,7 +17,7 @@ public class ServerMove extends Move {
     private int[][] board;
 
     public ServerMove(UUID ID, boolean isWhite, int from, int to, boolean success, String label, Coord f, Coord t) {
-        super(ID, isWhite, from, to, f.r, f.c, t.r, t.c);
+        super(ID, isWhite, from, to, f, t);
         this.success = success;
         this.label = label;
     }

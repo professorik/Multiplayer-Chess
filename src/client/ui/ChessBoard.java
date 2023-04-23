@@ -1,8 +1,7 @@
 package client.ui;
 
 import client.Client;
-import utils.chess.Pieces;
-import utils.cmd.Move;
+import utils.Coord;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -14,7 +13,6 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.HashMap;
-import java.util.HashSet;
 
 public class ChessBoard extends JPanel implements MouseListener, MouseMotionListener {
 
@@ -122,44 +120,16 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         if (parent == null) {
             parent = getParentByPos(prevX, prevY);
         } else if (parent != getParentByPos(prevX, prevY)) {
-            var a= getCoordsByPos(prevX, prevY);
-            var b = getCoordsByPos(e.getX(), e.getY());
-            var f_arr = getCoordsByPos2(prevX, prevY);
-            var t_arr = getCoordsByPos2(e.getX(), e.getY());
-            Client.client.move(a, b, f_arr[0], f_arr[1], t_arr[0], t_arr[1]);
+            var f = getCoordByPos(prevX, prevY);
+            var t = getCoordByPos(e.getX(), e.getY());
 
-            local[t_arr[0]][t_arr[1]] = local[f_arr[0]][f_arr[1]];
-            local[f_arr[0]][f_arr[1]] = 0;
+            processMove(f, t);
 
             prevX = e.getX();
             prevY = e.getY();
         }
         pieceToMoveButton.setVisible(true);
-        putCentered(pieceToMoveButton, parent);
-    }
-
-    public void movePiece(int from, int to) {
-        int f_y = from / 8, f_x = from % 8;
-        int t_y = to / 8, t_x = to % 8;
-        var ptm = (JLabel) piecesSquares[f_y][f_x].getComponent(0);
-        if (piecesSquares[f_y][f_x].getComponents().length > 0) {
-            piecesSquares[f_y][f_x].remove(0);
-        }
-
-        if (piecesSquares[t_y][t_x].getComponents().length > 0) {
-            piecesSquares[t_y][t_x].remove(0);
-        }
-        ptm.setVisible(true);
-        putCentered(ptm, piecesSquares[t_y][t_x]);
-    }
-
-    private void printTable(){
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                System.out.print(piecesSquares[i][j].getComponents().length + " ");
-            }
-            System.out.println();
-        }
+        putCenteredAndRepaint(pieceToMoveButton, parent);
     }
 
     @Override
@@ -172,15 +142,12 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
     public void mouseClicked(MouseEvent e) {
         if (!turn) return;
         if (clickX != -1) {
-            int from = getCoordsByPos(clickX, clickY), to = getCoordsByPos(e.getX(), e.getY());
-            var f_arr = getCoordsByPos2(clickX, clickY);
-            var t_arr = getCoordsByPos2(e.getX(), e.getY());
-            Client.client.move(from, to, f_arr[0], f_arr[1], t_arr[0], t_arr[1]);
+            var f = getCoordByPos(clickX, clickY);
+            var t = getCoordByPos(e.getX(), e.getY());
 
-            local[t_arr[0]][t_arr[1]] = local[f_arr[0]][f_arr[1]];
-            local[f_arr[0]][f_arr[1]] = 0;
+            processMove(f, t);
 
-            movePiece(63 - from, 63 - to);
+            movePiece(f, t);
             clickX = clickY = -1;
             return;
         }
@@ -189,6 +156,37 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
 
         clickX = e.getX();
         clickY = e.getY();
+    }
+
+    private void processMove(Coord f, Coord t) {
+        Client.client.move(f, t);
+
+        f.orient(white);
+        t.orient(white);
+        local[t.r][t.c] = local[f.r][f.c];
+        local[f.r][f.c] = 0;
+    }
+
+    public void movePiece(Coord from, Coord to) {
+        var ptm = (JLabel) piecesSquares[from.r][from.c].getComponent(0);
+        if (piecesSquares[from.r][from.c].getComponents().length > 0) {
+            piecesSquares[from.r][from.c].remove(0);
+        }
+
+        if (piecesSquares[to.r][to.c].getComponents().length > 0) {
+            piecesSquares[to.r][to.c].remove(0);
+        }
+        ptm.setVisible(true);
+        putCenteredAndRepaint(ptm, piecesSquares[to.r][to.c]);
+    }
+
+    private void printTable(){
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                System.out.print(piecesSquares[i][j].getComponents().length + " ");
+            }
+            System.out.println();
+        }
     }
 
     private Container getParentByPos(int x, int y) {
@@ -224,7 +222,7 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         return -1;
     }
 
-    private int[] getCoordsByPos2(int x, int y) {
+    private Coord getCoordByPos(int x, int y) {
         Component c = pieces.findComponentAt(x, y);
         Container parent = (Container) c;
         if (c instanceof JLabel) {
@@ -233,11 +231,11 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         for (int i = 0; i < piecesSquares.length; i++) {
             for (int j = 0; j < piecesSquares[i].length; j++) {
                 if (piecesSquares[i][j] == parent) {
-                    return new int[]{i, j};
+                    return new Coord(i, j);
                 }
             }
         }
-        return new int[]{-1, -1};
+        return Coord.EMPTY;
     }
 
     private void addButtons() {
@@ -277,42 +275,47 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
     private void setupNewGame() {
         for (int i = 0; i < local.length; i++) {
             for (int j = 0; j < local[i].length; j++) {
-                ImageIcon icon = getByCode2(local[i][j]);
+                ImageIcon icon = getByCode(local[i][j]);
                 if (icon == null) continue;
                 JLabel figure = new JLabel(icon);
                 putCentered(figure, piecesSquares[white? i: 7 - i][white? j: 7 - j]);
             }
         }
+        repaint();
     }
 
     public void mergeBoards(int[][] board) {
-        long kar = System.currentTimeMillis();
-        for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board[i].length; j++) {
+        System.out.println("=====================");
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                System.out.print(local[i][j]);
+            }
+            System.out.println();
+        }
+        System.out.println("=====================");
+        for (int i = 0; i < 8; i++) {
+            var row = white? i: 7 - i;
+            for (int j = 0; j < 8; j++) {
                 if (board[i][j] == local[i][j]) continue;
+                System.out.println("kar");
                 local[i][j] = board[i][j];
 
-                var sq = piecesSquares[white? i: 7 - i][white? j: 7 - j];
+                var sq = piecesSquares[row][white? j: 7 - j];
                 if (sq.getComponents().length > 0) {
                     sq.remove(0);
                 }
 
-                ImageIcon icon = getByCode2(board[i][j]);
+                ImageIcon icon = getByCode(board[i][j]);
                 if (icon == null) continue;
                 JLabel figure = new JLabel(icon);
                 putCentered(figure, sq);
             }
         }
         repaint();
-        System.out.println(System.currentTimeMillis() - kar);
+        System.out.println("=====================");
     }
 
-    private Image getByCode(int code) {
-        if (code == 0) return null;
-        return chessPieceImages[code < 0? 0: 1][Math.abs(code) - 1];
-    }
-
-    private ImageIcon getByCode2(int code) {
+    private ImageIcon getByCode(int code) {
         return chessPieceLabels.get(code);
     }
 
@@ -339,6 +342,10 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, label, 0, SpringLayout.HORIZONTAL_CENTER, panel);
         layout.putConstraint(SpringLayout.VERTICAL_CENTER, label, 0, SpringLayout.VERTICAL_CENTER, panel);
         panel.add(label);
+    }
+
+    private void putCenteredAndRepaint(JLabel label, Container panel) {
+        putCentered(label, panel);
         repaint();
     }
 
