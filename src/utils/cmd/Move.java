@@ -49,18 +49,26 @@ public class Move extends Message {
         return t;
     }
 
-    static class Coord implements Serializable {
-        int x;
-        int y;
+    public static class Coord implements Serializable {
+        int r;
+        int c;
 
-        public Coord(int x, int y) {
-            this.x = x;
-            this.y = y;
+        public Coord(int r, int c) {
+            this.r = r;
+            this.c = c;
+        }
+
+        public int getR() {
+            return r;
+        }
+
+        public int getC() {
+            return c;
         }
 
         @Override
         public String toString() {
-            return "(" + x + ", " + y + ")";
+            return "(" + r + ", " + c + ")";
         }
     }
 }

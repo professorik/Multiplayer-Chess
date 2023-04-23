@@ -63,8 +63,24 @@ public class Game {
                 move.setPieceKilled(destPiece);
             }
 
-            if (sourcePiece instanceof King king && king.isCastlingMove(move.getStart(), move.getEnd())) {
-                move.setCastlingMove(true);
+            if (sourcePiece instanceof King king){
+                king.setMoved(true);
+                if (king.isCastlingMove(move.getStart(), move.getEnd())) move.setCastlingMove(true);
+            }
+            if (sourcePiece instanceof Pawn pawn) {
+                if (pawn.isCheckEnPassant()) {
+                    var prev = movesPlayed.get(movesPlayed.size() - 1);
+                    if (pawn.isEnPassant(move.getStart(), move.getEnd(), prev)) {
+                        prev.getEnd().getPiece().setKilled(true);
+                        move.setPieceKilled(prev.getEnd().getPiece());
+                    } else {
+                        return false;
+                    }
+                }
+                if (pawn.isPromotion(move.getEnd())) {
+                    System.out.println("Promotion");
+                }
+                pawn.setMoved(true);
             }
 
             movesPlayed.add(move);
@@ -82,6 +98,10 @@ public class Game {
             e.printStackTrace();
         }
         return true;
+    }
+
+    public Board getBoard() {
+        return board;
     }
 }
 

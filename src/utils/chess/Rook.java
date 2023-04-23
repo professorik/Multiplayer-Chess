@@ -45,6 +45,11 @@ public class Rook extends Piece {
     }
 
     @Override
+    public int getIndex() {
+        return 2;
+    }
+
+    @Override
     public String toString() {
         return "R";
     }

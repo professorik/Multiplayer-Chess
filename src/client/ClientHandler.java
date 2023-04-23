@@ -88,15 +88,23 @@ public class ClientHandler {
                     var tmp = ois.readObject();
                     switch (tmp) {
                         case ServerMove cmd -> {
+                            /*var b = cmd.getBoard();
+                            for (int i = 0; i < 8; i++) {
+                                for (int j = 0; j < 8; j++) {
+                                    System.out.print(b[i][j]);
+                                }
+                                System.out.println();
+                            }*/
+                            Client.gui.getChessBoard().mergeBoards(cmd.getBoard());
                             if (cmd.isSuccess()) {
                                 turn = !turn;
                                 Client.gui.toggleClocks(turn);
                                 if (cmd.isWhite() == white) continue;
-                                Client.gui.getChessBoard().movePiece(cmd.getFrom(), cmd.getTo());
+                                //Client.gui.getChessBoard().movePiece(cmd.getFrom(), cmd.getTo());
                                 continue;
                             }
                             System.out.println("FAILED " + (63 - cmd.getTo()) + " " + (63 - cmd.getFrom()) + " " + cmd.getF() + " " + cmd.getT());
-                            Client.gui.getChessBoard().movePiece(63 - cmd.getTo(), 63 - cmd.getFrom());
+                            //Client.gui.getChessBoard().movePiece(63 - cmd.getTo(), 63 - cmd.getFrom());
                         }
                         case Start cmd -> {
                             roomID = cmd.getID();

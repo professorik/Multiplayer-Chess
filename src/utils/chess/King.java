@@ -55,6 +55,11 @@ public class King extends Piece {
     }
 
     @Override
+    public int getIndex() {
+        return 5;
+    }
+
+    @Override
     public String toString() {
         return "K";
     }

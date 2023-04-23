@@ -32,15 +32,15 @@ public class Board {
 
     public void resetBoard() {
         for (int j = 0; j < STARTING_ROW.length; j++) {
-            boxes[0][j] = new Spot(j, 0, fabric(STARTING_ROW[j], true));
-            boxes[1][j] = new Spot(j, 1, new Pawn(true));
+            boxes[0][j] = new Spot(0, j, fabric(STARTING_ROW[j], true));
+            boxes[1][j] = new Spot(1, j, new Pawn(true));
 
             for (int i = 2; i < 6; i++) {
-                boxes[i][j] = new Spot(j, i, null);
+                boxes[i][j] = new Spot(i, j, null);
             }
 
-            boxes[6][j] = new Spot(j, 6, new Pawn(false));
-            boxes[7][j] = new Spot(j, 7, fabric(STARTING_ROW[j], false));
+            boxes[6][j] = new Spot(6, j, new Pawn(false));
+            boxes[7][j] = new Spot(7, j, fabric(STARTING_ROW[j], false));
         }
     }
 
@@ -55,10 +55,23 @@ public class Board {
         };
     }
 
+    public int[][] convert() {
+        int[][] res = new int[8][8];
+        for (int i = 0; i < boxes.length; i++) {
+            for (int j = 0; j < boxes[i].length; j++) {
+                try {
+                    var piece = getBox(j, i).getPiece();
+                    res[7 - i][j] = piece == null? 0: piece.getIndex() * (piece.isWhite()? 1: -1);
+                } catch (Exception ignored){}
+            }
+        }
+        return res;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < boxes.length; i++) {
+        for (int i = boxes.length - 1; i >= 0; i--) {
             for (int j = 0; j < boxes[i].length; j++) {
                 sb.append(boxes[i][j].toString());
             }

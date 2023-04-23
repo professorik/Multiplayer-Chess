@@ -22,6 +22,11 @@ public class Queen extends Piece {
     }
 
     @Override
+    public int getIndex() {
+        return 6;
+    }
+
+    @Override
     public String toString() {
         return "Q";
     }

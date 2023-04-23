@@ -39,24 +39,20 @@ public class Room {
     }
 
     protected void move(Move move) throws Exception {
-        int startX = move.getFrom() / 8, startY = move.getFrom() % 8;
-        int endX = move.getTo() / 8, endY = move.getTo() % 8;
-        System.out.println(startX + " " + startY + " " + endX + " " + endY + " " + move.getF() + " " + move.getT());
-        if (!userToPlayer.get(move.getID()).whiteSide) {
-            startY = 7 - startY;
-            endY = 7 - endY;
-        } else {
-            startX = 7 - startX;
-            endX = 7 - endX;
+        int startC = move.getF().getC(), startR = move.getF().getR();
+        int endC = move.getT().getC(), endR = move.getT().getR();
+        if (userToPlayer.get(move.getID()).whiteSide) {
+            startR = 7 - startR;
+            endR = 7 - endR;
         }
-        System.out.println(startX + " / " + startY + " " + endX + " " + endY + " " + move.getF() + " " + move.getT());
+        System.out.println(startC + " " + startR + " " + endC + " " + endR + " " + move.getF() + " " + move.getT());
 
-        boolean fl = game.playerMove(userToPlayer.get(move.getID()), startX, startY, endX, endY);
+        boolean fl = game.playerMove(userToPlayer.get(move.getID()), startC, startR, endC, endR);
         if (!fl) {
-            broadcastMirror(new ServerMove(move, false, ""));
+            broadcastMirror(new ServerMove(move, false, "", game.getBoard().convert()));
             return;
         }
-        broadcast(new ServerMove(move, true, ""));
+        broadcast(new ServerMove(move, true, "", game.getBoard().convert()));
         if (game.isEnd()) {
             //FIXME: use Finish
             broadcast(new Message(ID, game.getStatus().name()));

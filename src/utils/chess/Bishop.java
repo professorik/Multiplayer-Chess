@@ -34,6 +34,11 @@ public class Bishop extends Piece {
     }
 
     @Override
+    public int getIndex() {
+        return 3;
+    }
+
+    @Override
     public String toString() {
         return "B";
     }
