@@ -56,12 +56,7 @@ public class Game {
             Piece sourcePiece = move.getStart().getPiece();
             if (sourcePiece == null || sourcePiece.isWhite() != player.isWhiteSide()) return false;
             if (!sourcePiece.canMove(board, move.getStart(), move.getEnd())) return false;
-
-            Piece destPiece = move.getEnd().getPiece();
-            if (destPiece != null) {
-                destPiece.setKilled(true);
-                move.setPieceKilled(destPiece);
-            }
+            if (moveUnderCheck(move, player)) return false;
 
             boolean isNotCastling = true;
             if (sourcePiece instanceof King king) {
@@ -96,6 +91,12 @@ public class Game {
                 pawn.setMoved(true);
             }
 
+            Piece destPiece = move.getEnd().getPiece();
+            if (destPiece != null) {
+                destPiece.setKilled(true);
+                move.setPieceKilled(destPiece);
+            }
+
             movesPlayed.add(move);
             if (isNotCastling)
                 move.getEnd().setPiece(move.getStart().getPiece());
@@ -111,6 +112,22 @@ public class Game {
             e.printStackTrace();
         }
         return true;
+    }
+
+    private boolean moveUnderCheck(Move move, Player player) throws Exception {
+        move.getEnd().setPiece(move.getStart().getPiece());
+        move.getStart().setPiece(null);
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                if (board.getBox(col, row).getPiece() instanceof King king && king.isWhite() == player.isWhiteSide()) {
+                    boolean checked = king.isChecked(board, col, row);
+                    move.getStart().setPiece(move.getEnd().getPiece());
+                    move.getEnd().setPiece(null);
+                    return checked;
+                }
+            }
+        }
+        return false;
     }
 
     public Board getBoard() {

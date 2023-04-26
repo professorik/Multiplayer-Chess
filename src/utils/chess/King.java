@@ -60,7 +60,7 @@ public class King extends Piece {
         return Math.abs(start.getX() - end.getX()) > 1;
     }
 
-    private boolean isChecked(Board board, int c, int r) {
+    protected boolean isChecked(Board board, int c, int r) {
         try {
             for (int row = 0; row < 8; row++) {
                 for (int col = 0; col < 8; col++) {
