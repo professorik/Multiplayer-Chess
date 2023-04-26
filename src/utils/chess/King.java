@@ -33,20 +33,31 @@ public class King extends Piece {
     }
 
     private boolean isValidCastling(Board board, Spot start, Spot end) {
-        if (this.isMoved() || (end.getPiece() instanceof Rook rook && rook.isMoved())) return false;
+        if (this.isMoved()) return false;
 
-        if (Math.abs(start.getY() - end.getY()) < 2) return false;
+        int dc = end.getX() - start.getX();
+        int adc = Math.abs(dc);
+        if (adc < 2) return false;
+        dc /= adc;
 
+        if (isMoved() || isChecked(board, start.getX(), start.getY())) return false;
 
-        // Logic for returning true or false
-        return start == end;
+        try {
+            int col = start.getX() + dc;
+            for (; 0 < col && col < 7; col += dc) {
+                Spot spot = board.getBox(col, start.getY());
+                if (spot.getPiece() != null || isChecked(board, col, start.getY()))
+                    return false;
+            }
+            if (!(board.getBox(col, start.getY()).getPiece() instanceof Rook rook) || rook.isMoved())
+                return false;
+        } catch (Exception ignored) {
+        }
+        return true;
     }
 
     public boolean isCastlingMove(Spot start, Spot end) {
-        // check if the starting and
-        // ending position are correct
-        // TODO: implement
-        return true;
+        return Math.abs(start.getX() - end.getX()) > 1;
     }
 
     private boolean isChecked(Board board, int x, int y) {

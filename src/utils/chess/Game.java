@@ -24,7 +24,7 @@ public class Game {
     public void initialize(Player p1, Player p2) {
         players[0] = p1;
         players[1] = p2;
-        currentTurn = p1.isWhiteSide()? p1: p2;
+        currentTurn = p1.isWhiteSide() ? p1 : p2;
         status = GameStatus.ACTIVE;
         System.out.println(board);
     }
@@ -63,11 +63,24 @@ public class Game {
                 move.setPieceKilled(destPiece);
             }
 
-            if (sourcePiece instanceof King king){
+            boolean isNotCastling = true;
+            if (sourcePiece instanceof King king) {
                 king.setMoved(true);
-                if (king.isCastlingMove(move.getStart(), move.getEnd())) move.setCastlingMove(true);
-            }
-            if (sourcePiece instanceof Pawn pawn) {
+                if (king.isCastlingMove(move.getStart(), move.getEnd())) {
+                    int dc = move.getEnd().getX() - move.getStart().getX();
+                    dc /= Math.abs(dc);
+                    Spot rookSpot = board.getBox(dc > 0? 7: 0, move.getStart().getY());
+                    Rook rook = (Rook) rookSpot.getPiece();
+                    rook.setMoved(true);
+
+                    rookSpot.setPiece(null);
+                    board.getBox(move.getStart().getX() + dc, move.getStart().getY()).setPiece(rook);
+                    board.getBox(move.getStart().getX() + 2*dc, move.getStart().getY()).setPiece(king);
+                    isNotCastling = false;
+                }
+            } else if (sourcePiece instanceof Rook rook) {
+                rook.setMoved(true);
+            } else if (sourcePiece instanceof Pawn pawn) {
                 if (pawn.isCheckEnPassant()) {
                     var prev = movesPlayed.get(movesPlayed.size() - 1);
                     if (pawn.isEnPassant(move.getStart(), move.getEnd(), prev)) {
@@ -84,8 +97,8 @@ public class Game {
             }
 
             movesPlayed.add(move);
-
-            move.getEnd().setPiece(move.getStart().getPiece());
+            if (isNotCastling)
+                move.getEnd().setPiece(move.getStart().getPiece());
             move.getStart().setPiece(null);
 
             if (destPiece instanceof King) {
@@ -94,7 +107,7 @@ public class Game {
 
             currentTurn = currentTurn == players[0] ? players[1] : players[0];
             System.out.println(board);
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return true;
