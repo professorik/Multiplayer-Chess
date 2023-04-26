@@ -60,8 +60,17 @@ public class King extends Piece {
         return Math.abs(start.getX() - end.getX()) > 1;
     }
 
-    private boolean isChecked(Board board, int x, int y) {
-        // TODO: implement
+    private boolean isChecked(Board board, int c, int r) {
+        try {
+            for (int row = 0; row < 8; row++) {
+                for (int col = 0; col < 8; col++) {
+                    Spot tmp = board.getBox(col, row);
+                    if (tmp.getPiece() == null || tmp.getPiece().isWhite() == isWhite()) continue;
+                    if (tmp.getPiece().canMove(board, tmp, board.getBox(c, r))) return true;
+                }
+            }
+        } catch (Exception ignored) {
+        }
         return false;
     }
 
