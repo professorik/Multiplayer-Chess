@@ -17,7 +17,6 @@ public class Rook extends Piece {
     public boolean canMove(Board board, Spot start, Spot end) {
         if (isTaken(end)) return false;
 
-        System.out.println(start.getCoord() + " " + end.getCoord());
         int dy = end.getY() - start.getY(), dx = end.getX() - start.getX();
         int pdy = Math.abs(dy), pdx = Math.abs(dx);
 

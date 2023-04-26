@@ -46,7 +46,8 @@ public class Pawn extends Piece {
         int k = isWhite()? 1: -1;
         int adx = Math.abs(end.getX() - start.getX());
         int dy = end.getY() - start.getY();
-        if (prev.getStart().getPiece() instanceof Pawn pawn && pawn.isDoubleMove(prev.getStart(), prev.getEnd())) {
+        System.out.println(k + " " + adx + " " + dy);
+        if (prev.getEnd().getPiece() instanceof Pawn pawn && pawn.isDoubleMove(prev.getStart(), prev.getEnd())) {
             return start.getY() == prev.getEnd().getY() && end.getX() == prev.getEnd().getX() && dy * adx == k;
         }
         return false;
@@ -61,8 +62,11 @@ public class Pawn extends Piece {
      * @return boolean
      */
     public boolean isCheckEnPassant() {
-        checkEnPassant = !checkEnPassant;
-        return !checkEnPassant;
+        if (checkEnPassant) {
+            checkEnPassant = false;
+            return true;
+        }
+        return false;
     }
 
     public boolean isPromotion(Spot end) {

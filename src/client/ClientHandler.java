@@ -88,7 +88,7 @@ public class ClientHandler {
                             var b = cmd.getBoard();
                             for (int i = 0; i < 8; i++) {
                                 for (int j = 0; j < 8; j++) {
-                                    System.out.print(b[i][j]);
+                                    System.out.printf("%2s", b[i][j]);
                                 }
                                 System.out.println();
                             }

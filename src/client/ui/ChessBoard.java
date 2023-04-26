@@ -257,7 +257,7 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         System.out.println("=====================");
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                System.out.print(local[i][j]);
+                System.out.printf("%2s", local[i][j]);
             }
             System.out.println();
         }
@@ -310,6 +310,9 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
         if (!(panel.getLayout() instanceof SpringLayout layout)) return;
         layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, label, 0, SpringLayout.HORIZONTAL_CENTER, panel);
         layout.putConstraint(SpringLayout.VERTICAL_CENTER, label, 0, SpringLayout.VERTICAL_CENTER, panel);
+        if (panel.getComponents().length > 0) {
+            panel.remove(panel.getComponents().length - 1);
+        }
         panel.add(label);
     }
 

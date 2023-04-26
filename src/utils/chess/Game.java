@@ -71,8 +71,8 @@ public class Game {
                 if (pawn.isCheckEnPassant()) {
                     var prev = movesPlayed.get(movesPlayed.size() - 1);
                     if (pawn.isEnPassant(move.getStart(), move.getEnd(), prev)) {
-                        prev.getEnd().getPiece().setKilled(true);
                         move.setPieceKilled(prev.getEnd().getPiece());
+                        prev.getEnd().setPiece(null);
                     } else {
                         return false;
                     }
