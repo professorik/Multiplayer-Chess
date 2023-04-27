@@ -32,6 +32,8 @@ public abstract class Piece {
 
     public abstract boolean canMove(Board board, Spot start, Spot end);
 
+    public abstract int getIndex();
+
     protected boolean isTaken(Spot spot) {
         return spot.getPiece() != null && spot.getPiece().isWhite() == this.isWhite();
     }

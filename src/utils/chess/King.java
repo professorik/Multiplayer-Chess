@@ -33,25 +33,52 @@ public class King extends Piece {
     }
 
     private boolean isValidCastling(Board board, Spot start, Spot end) {
-        if (this.isMoved() || (end.getPiece() instanceof Rook rook && rook.isMoved())) return false;
+        if (this.isMoved()) return false;
 
-        if (Math.abs(start.getY() - end.getY()) < 2) return false;
+        int dc = end.getX() - start.getX();
+        int adc = Math.abs(dc);
+        if (adc < 2) return false;
+        dc /= adc;
 
+        if (isMoved() || isChecked(board, start.getX(), start.getY())) return false;
 
-        // Logic for returning true or false
-        return start == end;
-    }
-
-    public boolean isCastlingMove(Spot start, Spot end) {
-        // check if the starting and
-        // ending position are correct
-        // TODO: implement
+        try {
+            int col = start.getX() + dc;
+            for (; 0 < col && col < 7; col += dc) {
+                Spot spot = board.getBox(col, start.getY());
+                if (spot.getPiece() != null || isChecked(board, col, start.getY()))
+                    return false;
+            }
+            if (!(board.getBox(col, start.getY()).getPiece() instanceof Rook rook) || rook.isMoved())
+                return false;
+        } catch (Exception ignored) {
+        }
         return true;
     }
 
-    private boolean isChecked(Board board, int x, int y) {
-        // TODO: implement
+    public boolean isCastlingMove(Spot start, Spot end) {
+        return Math.abs(start.getX() - end.getX()) > 1;
+    }
+
+    protected boolean isChecked(Board board, int c, int r) {
+        try {
+            for (int row = 0; row < 8; row++) {
+                for (int col = 0; col < 8; col++) {
+                    Spot tmp = board.getBox(col, row);
+                    Piece piece = tmp.getPiece();
+                    if (piece == null || piece.isWhite() == isWhite()) continue;
+                    if (piece.canMove(board, tmp, board.getBox(c, r)) && !(piece instanceof Pawn && col == c))
+                        return true;
+                }
+            }
+        } catch (Exception ignored) {
+        }
         return false;
+    }
+
+    @Override
+    public int getIndex() {
+        return 5;
     }
 
     @Override

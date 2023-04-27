@@ -22,9 +22,10 @@ public class Rook extends Piece {
 
         if (pdy * pdx != 0 || pdy + pdx == 0) return false;
 
-        dy /= pdy;
-        dx /= pdx;
-        for (int y = start.getY() + dy, x = start.getX() + dx; y != end.getY() && x != end.getX(); y += dy, x += dx) {
+        if (pdy != 0) dy /= pdy;
+        if (pdx != 0) dx /= pdx;
+
+        for (int y = start.getY() + dy, x = start.getX() + dx; y != end.getY() || x != end.getX(); y += dy, x += dx) {
             try {
                 if (board.getBox(x, y).getPiece() != null) {
                     return false;
@@ -42,6 +43,11 @@ public class Rook extends Piece {
 
     public void setMoved(boolean moved) {
         this.moved = moved;
+    }
+
+    @Override
+    public int getIndex() {
+        return 2;
     }
 
     @Override

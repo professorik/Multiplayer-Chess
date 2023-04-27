@@ -1,5 +1,7 @@
 package utils.cmd;
 
+import utils.Coord;
+
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -17,16 +19,16 @@ public class Move extends Message {
     private final Coord t;
 
     public Move(UUID ID, boolean isWhite, int from, int to) {
-        this(ID, isWhite, from, to, -1, -1, -1, -1);
+        this(ID, isWhite, from, to, Coord.EMPTY, Coord.EMPTY);
     }
 
-    public Move(UUID ID, boolean isWhite, int from, int to, int fx, int fy, int tx, int ty) {
+    public Move(UUID ID, boolean isWhite, int from, int to, Coord f, Coord t) {
         super(ID, "M");
         this.isWhite = isWhite;
         this.from = from;
         this.to = to;
-        this.f = new Coord(fx, fy);
-        this.t = new Coord(tx, ty);
+        this.f = f;
+        this.t = t;
     }
 
     public boolean isWhite() {
@@ -47,20 +49,5 @@ public class Move extends Message {
 
     public Coord getT() {
         return t;
-    }
-
-    static class Coord implements Serializable {
-        int x;
-        int y;
-
-        public Coord(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        @Override
-        public String toString() {
-            return "(" + x + ", " + y + ")";
-        }
     }
 }

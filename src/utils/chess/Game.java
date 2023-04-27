@@ -24,7 +24,7 @@ public class Game {
     public void initialize(Player p1, Player p2) {
         players[0] = p1;
         players[1] = p2;
-        currentTurn = p1.isWhiteSide()? p1: p2;
+        currentTurn = p1.isWhiteSide() ? p1 : p2;
         status = GameStatus.ACTIVE;
         System.out.println(board);
     }
@@ -56,6 +56,40 @@ public class Game {
             Piece sourcePiece = move.getStart().getPiece();
             if (sourcePiece == null || sourcePiece.isWhite() != player.isWhiteSide()) return false;
             if (!sourcePiece.canMove(board, move.getStart(), move.getEnd())) return false;
+            if (moveUnderCheck(move, player)) return false;
+
+            boolean isNotCastling = true;
+            if (sourcePiece instanceof King king) {
+                king.setMoved(true);
+                if (king.isCastlingMove(move.getStart(), move.getEnd())) {
+                    int dc = move.getEnd().getX() - move.getStart().getX();
+                    dc /= Math.abs(dc);
+                    Spot rookSpot = board.getBox(dc > 0? 7: 0, move.getStart().getY());
+                    Rook rook = (Rook) rookSpot.getPiece();
+                    rook.setMoved(true);
+
+                    rookSpot.setPiece(null);
+                    board.getBox(move.getStart().getX() + dc, move.getStart().getY()).setPiece(rook);
+                    board.getBox(move.getStart().getX() + 2*dc, move.getStart().getY()).setPiece(king);
+                    isNotCastling = false;
+                }
+            } else if (sourcePiece instanceof Rook rook) {
+                rook.setMoved(true);
+            } else if (sourcePiece instanceof Pawn pawn) {
+                if (pawn.isCheckEnPassant()) {
+                    var prev = movesPlayed.get(movesPlayed.size() - 1);
+                    if (pawn.isEnPassant(move.getStart(), move.getEnd(), prev)) {
+                        move.setPieceKilled(prev.getEnd().getPiece());
+                        prev.getEnd().setPiece(null);
+                    } else {
+                        return false;
+                    }
+                }
+                if (pawn.isPromotion(move.getEnd())) {
+                    System.out.println("Promotion");
+                }
+                pawn.setMoved(true);
+            }
 
             Piece destPiece = move.getEnd().getPiece();
             if (destPiece != null) {
@@ -63,13 +97,9 @@ public class Game {
                 move.setPieceKilled(destPiece);
             }
 
-            if (sourcePiece instanceof King king && king.isCastlingMove(move.getStart(), move.getEnd())) {
-                move.setCastlingMove(true);
-            }
-
             movesPlayed.add(move);
-
-            move.getEnd().setPiece(move.getStart().getPiece());
+            if (isNotCastling)
+                move.getEnd().setPiece(move.getStart().getPiece());
             move.getStart().setPiece(null);
 
             if (destPiece instanceof King) {
@@ -78,10 +108,30 @@ public class Game {
 
             currentTurn = currentTurn == players[0] ? players[1] : players[0];
             System.out.println(board);
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return true;
+    }
+
+    private boolean moveUnderCheck(Move move, Player player) throws Exception {
+        move.getEnd().setPiece(move.getStart().getPiece());
+        move.getStart().setPiece(null);
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                if (board.getBox(col, row).getPiece() instanceof King king && king.isWhite() == player.isWhiteSide()) {
+                    boolean checked = king.isChecked(board, col, row);
+                    move.getStart().setPiece(move.getEnd().getPiece());
+                    move.getEnd().setPiece(null);
+                    return checked;
+                }
+            }
+        }
+        return false;
+    }
+
+    public Board getBoard() {
+        return board;
     }
 }
 

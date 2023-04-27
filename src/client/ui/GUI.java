@@ -14,7 +14,7 @@ public class GUI {
     private ChessBoard chessBoard;
 
     public GUI() {
-        initializeGui(false);
+        initializeGui(true);
     }
 
     public final void initializeGui(boolean white) {
