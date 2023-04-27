@@ -65,8 +65,10 @@ public class King extends Piece {
             for (int row = 0; row < 8; row++) {
                 for (int col = 0; col < 8; col++) {
                     Spot tmp = board.getBox(col, row);
-                    if (tmp.getPiece() == null || tmp.getPiece().isWhite() == isWhite()) continue;
-                    if (tmp.getPiece().canMove(board, tmp, board.getBox(c, r))) return true;
+                    Piece piece = tmp.getPiece();
+                    if (piece == null || piece.isWhite() == isWhite()) continue;
+                    if (piece.canMove(board, tmp, board.getBox(c, r)) && !(piece instanceof Pawn && col == c))
+                        return true;
                 }
             }
         } catch (Exception ignored) {
