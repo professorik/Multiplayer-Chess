@@ -2,6 +2,8 @@ package client.ui;
 
 import client.Client;
 import utils.Coord;
+import utils.chess.Pawn;
+import utils.chess.Pieces;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -159,10 +161,19 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
     }
 
     private void processMove(Coord f, Coord t) {
-        Client.client.move(f, t);
-
+        Coord fc = new Coord(f.r, f.c), tc = new Coord(t.r, t.c);
         f.orient(white);
         t.orient(white);
+        if (local[f.r][f.c] == (white? 1: -1) && tc.r == 0) {
+            var figure = Popup.showPromotion();
+            Client.client.move(fc, tc, figure);
+
+            local[f.r][f.c] = figure.getPiece(white).getIndex();
+            ImageIcon icon = getByCode(local[f.r][f.c]);
+            pieceToMoveButton = new JLabel(icon);
+        } else {
+            Client.client.move(fc, tc);
+        }
         local[t.r][t.c] = local[f.r][f.c];
         local[f.r][f.c] = 0;
     }
@@ -254,14 +265,14 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
     }
 
     public void mergeBoards(int[][] board) {
-        System.out.println("=====================");
+        /*System.out.println("=====================");
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 System.out.printf("%2s", local[i][j]);
             }
             System.out.println();
         }
-        System.out.println("=====================");
+        System.out.println("=====================");*/
         for (int i = 0; i < 8; i++) {
             var row = white? i: 7 - i;
             for (int j = 0; j < 8; j++) {
@@ -281,7 +292,7 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
             }
         }
         repaint();
-        System.out.println("=====================");
+        //System.out.println("=====================");
     }
 
     private ImageIcon getByCode(int code) {

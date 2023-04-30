@@ -42,9 +42,13 @@ public class Game {
     }
 
     public boolean playerMove(Player player, int startX, int startY, int endX, int endY) throws Exception {
+        return playerMove(player, startX, startY, endX, endY, null);
+    }
+
+    public boolean playerMove(Player player, int startX, int startY, int endX, int endY, Pieces piece) throws Exception {
         Spot startBox = board.getBox(startX, startY);
         Spot endBox = board.getBox(endX, endY);
-        Move move = new Move(player, startBox, endBox);
+        Move move = new Move(player, startBox, endBox, piece);
         return makeMove(move, player);
     }
 
@@ -86,7 +90,10 @@ public class Game {
                     }
                 }
                 if (pawn.isPromotion(move.getEnd())) {
-                    System.out.println("Promotion");
+                    Pieces piece = move.getPieceChosen();
+                    if (piece == null) piece = Pieces.QUEEN;
+                    move.getStart().setPiece(piece.getPiece(player.isWhiteSide()));
+                    //TODO: interchange the pawn to a chosen figure
                 }
                 pawn.setMoved(true);
             }

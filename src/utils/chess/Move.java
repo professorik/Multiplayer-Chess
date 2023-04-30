@@ -6,17 +6,19 @@ package utils.chess;
  * @project socket-chess
  */
 public class Move {
-    private Player player;
-    private Spot start;
-    private Spot end;
+    private final Player player;
+    private final Spot start;
+    private final Spot end;
     private Piece pieceMoved;
     private Piece pieceKilled;
+    private Pieces pieceChosen;
     private boolean castlingMove = false;
 
-    public Move(Player player, Spot start, Spot end) {
+    public Move(Player player, Spot start, Spot end, Pieces pieceChosen) {
         this.player = player;
         this.start = start;
         this.end = end;
+        this.pieceChosen = pieceChosen;
         this.pieceMoved = start.getPiece();
     }
 
@@ -34,6 +36,14 @@ public class Move {
 
     public void setPieceKilled(Piece pieceKilled) {
         this.pieceKilled = pieceKilled;
+    }
+
+    public void setPieceChosen(Pieces pieceChosen) {
+        this.pieceChosen = pieceChosen;
+    }
+
+    public Pieces getPieceChosen() {
+        return pieceChosen;
     }
 
     public Spot getStart() {

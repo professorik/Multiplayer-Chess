@@ -3,6 +3,7 @@ package client;
 import client.ui.ButtonPanel;
 import client.ui.Popup;
 import utils.Coord;
+import utils.chess.Pieces;
 import utils.cmd.*;
 
 import java.io.*;
@@ -48,6 +49,10 @@ public class ClientHandler {
         if (turn) sendObj(new Move(ID, white, -1, -1, f, t));
     }
 
+    public void move(Coord f, Coord t, Pieces piece) {
+        if (turn) sendObj(new PromotionMove(ID, white, -1, -1, f, t, piece));
+    }
+
     public void resign() {
         sendObj(new Resign(ID));
     }
@@ -84,7 +89,7 @@ public class ClientHandler {
                 while (true) {
                     var tmp = ois.readObject();
                     switch (tmp) {
-                        case ServerMove cmd -> {
+                        case utils.cmd.State cmd -> {
                             var b = cmd.getBoard();
                             for (int i = 0; i < 8; i++) {
                                 for (int j = 0; j < 8; j++) {

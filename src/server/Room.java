@@ -48,14 +48,18 @@ public class Room {
             startC = 7 - startC;
             endC = 7 - endC;
         }
-        System.out.println(startR + " " + startC + " " + endR + " " + endC + " " + move.getF() + " " + move.getT());
 
-        boolean fl = game.playerMove(userToPlayer.get(move.getID()), startC, startR, endC, endR);
-        if (!fl) {
-            broadcastMirror(new ServerMove(move, false, "", game.getBoard().convert()));
+        boolean success;
+        if (move instanceof PromotionMove pm) {
+            success = game.playerMove(userToPlayer.get(move.getID()), startC, startR, endC, endR, pm.getPiece());
+        } else {
+            success = game.playerMove(userToPlayer.get(move.getID()), startC, startR, endC, endR);
+        }
+        if (!success) {
+            broadcastMirror(new State(move, false, "", game.getBoard().convert()));
             return;
         }
-        broadcast(new ServerMove(move, true, "", game.getBoard().convert()));
+        broadcast(new State(move, true, "", game.getBoard().convert()));
         if (game.isEnd()) {
             //FIXME: use Finish
             broadcast(new Message(ID, game.getStatus().name()));

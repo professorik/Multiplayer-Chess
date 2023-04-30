@@ -1,5 +1,7 @@
 package client.ui;
 
+import utils.chess.Pieces;
+
 import javax.swing.*;
 
 /**
@@ -19,5 +21,13 @@ public class Popup {
             return;
         }
         show(reason, white == isWhite? "You won": "You lost");
+    }
+
+    public static Pieces showPromotion() {
+        String[] options = {"Queen", "Rook", "Knight", "Bishop"};
+        int idx = JOptionPane.showOptionDialog(null, "Choose a figure",
+                "Promotion",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+        return Pieces.valueOf(options[idx].toUpperCase());
     }
 }
