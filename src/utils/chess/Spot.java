@@ -8,8 +8,10 @@ import utils.Coord;
  * @project socket-chess
  */
 public class Spot {
+
     private Piece piece;
     private final Coord coord;
+    public static final Spot DEFAULT = new Spot(-1, -1, null);
 
     public Spot(int r, int c, Piece piece) {
         this.setPiece(piece);

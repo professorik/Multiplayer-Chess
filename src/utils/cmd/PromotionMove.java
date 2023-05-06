@@ -12,6 +12,7 @@ import java.util.UUID;
  */
 public class PromotionMove extends Move {
 
+    //TODO: change to id
     private final Pieces piece;
 
     public PromotionMove(UUID ID, boolean isWhite, int from, int to, Coord f, Coord t, Pieces piece) {

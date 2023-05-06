@@ -22,13 +22,7 @@ public class Bishop extends Piece {
         dy /= pdy;
         dx /= pdx;
         for (int y = start.getY() + dy, x = start.getX() + dx; y != end.getY(); y += dy, x += dx) {
-            try {
-                if (board.getBox(x, y).getPiece() != null) {
-                    return false;
-                }
-            } catch (Exception e) {
-                return false;
-            }
+            if (board.getBox(x, y).getPiece() != null) return false;
         }
         return true;
     }

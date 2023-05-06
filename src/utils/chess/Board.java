@@ -23,9 +23,10 @@ public class Board {
         this.resetBoard();
     }
 
-    public Spot getBox(int x, int y) throws Exception {
+    public Spot getBox(int x, int y) {
         if (x < 0 || x > 7 || y < 0 || y > 7) {
-            throw new Exception("Index out of bound");
+            System.out.println("INDEX OUT OF BOUND");
+            return Spot.DEFAULT;
         }
         return boxes[y][x];
     }
@@ -45,7 +46,7 @@ public class Board {
     }
 
     private Piece fabric(Pieces piece, boolean white) {
-        return switch (piece){
+        return switch (piece) {
             case PAWN -> new Pawn(white);
             case BISHOP -> new Bishop(white);
             case KNIGHT -> new Knight(white);
@@ -59,10 +60,8 @@ public class Board {
         int[][] res = new int[8][8];
         for (int i = 0; i < boxes.length; i++) {
             for (int j = 0; j < boxes[i].length; j++) {
-                try {
-                    var piece = getBox(j, i).getPiece();
-                    res[7 - i][j] = piece == null? 0: piece.getIndex() * (piece.isWhite()? 1: -1);
-                } catch (Exception ignored){}
+                var piece = getBox(j, i).getPiece();
+                res[7 - i][j] = piece == null ? 0 : piece.getIndex() * (piece.isWhite() ? 1 : -1);
             }
         }
         return res;

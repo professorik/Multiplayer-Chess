@@ -1,6 +1,7 @@
 package server;
 
 import utils.chess.Game;
+import utils.chess.GameStatus;
 import utils.chess.Player;
 import utils.cmd.*;
 
@@ -41,7 +42,8 @@ public class Room {
     protected void move(Move move) throws Exception {
         int startC = move.getF().c, startR = move.getF().r;
         int endC = move.getT().c, endR = move.getT().r;
-        if (userToPlayer.get(move.getID()).whiteSide) {
+        Player player = userToPlayer.get(move.getID());
+        if (player.whiteSide) {
             startR = 7 - startR;
             endR = 7 - endR;
         } else {
@@ -51,19 +53,19 @@ public class Room {
 
         boolean success;
         if (move instanceof PromotionMove pm) {
-            success = game.playerMove(userToPlayer.get(move.getID()), startC, startR, endC, endR, pm.getPiece());
+            success = game.playerMove(player, startC, startR, endC, endR, pm.getPiece());
         } else {
-            success = game.playerMove(userToPlayer.get(move.getID()), startC, startR, endC, endR);
+            success = game.playerMove(player, startC, startR, endC, endR);
         }
-        if (!success) {
+        if (success)
+            broadcast(new State(move, true, "", game.getBoard().convert()));
+        else
             broadcastMirror(new State(move, false, "", game.getBoard().convert()));
-            return;
-        }
-        broadcast(new State(move, true, "", game.getBoard().convert()));
-        if (game.isEnd()) {
-            //FIXME: use Finish
-            broadcast(new Message(ID, game.getStatus().name()));
-        }
+
+        Player opponent = userToPlayer.values().stream().filter(p -> p.whiteSide != player.whiteSide).findFirst().orElseThrow();
+        game.processEnding(player, opponent, move.getTime());
+        System.out.println(game.isEnd());
+        if (game.isEnd()) broadcast(new Finish(ID, game.getStatus()));
     }
 
     protected void draw(SuggestDraw cmd) {

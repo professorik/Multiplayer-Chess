@@ -25,9 +25,10 @@ public class King extends Piece {
     public boolean canMove(Board board, Spot start, Spot end) {
         if (isTaken(end)) return false;
 
-        int x = Math.abs(start.getY() - end.getY());
-        int y = Math.abs(start.getX() - end.getX());
-        if (x < 2 && y < 2) return x + y != 0;
+        int r = Math.abs(start.getY() - end.getY());
+        int c = Math.abs(start.getX() - end.getX());
+        if (r < 2 && c < 2) return r + c != 0;
+        if (r > 0) return false;
 
         return this.isValidCastling(board, start, end);
     }
@@ -67,7 +68,7 @@ public class King extends Piece {
                     Spot tmp = board.getBox(col, row);
                     Piece piece = tmp.getPiece();
                     if (piece == null || piece.isWhite() == isWhite()) continue;
-                    if (piece.canMove(board, tmp, board.getBox(c, r)) && !(piece instanceof Pawn && col == c))
+                    if (!(piece instanceof Pawn && col == c) && piece.canMove(board, tmp, board.getBox(c, r)))
                         return true;
                 }
             }

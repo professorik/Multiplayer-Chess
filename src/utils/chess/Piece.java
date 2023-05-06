@@ -32,6 +32,42 @@ public abstract class Piece {
 
     public abstract boolean canMove(Board board, Spot start, Spot end);
 
+    public boolean allowedToMove(Board board, Spot start, Spot end) {
+        return canMove(board, start, end) && !moveUnderCheck(board, start, end);
+    }
+
+    public boolean canMove(Board board, Spot start) {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                if (start.getX() == col && start.getY() == row) continue;
+                if (allowedToMove(board, start, board.getBox(col, row))) return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean moveUnderCheck(Board board, Spot start, Spot end) {
+        if (start.getPiece() instanceof King) {
+            System.out.println(start.getY() + " " + start.getX() + " -> " + end.getY() + " " + end.getX());
+        }
+        end.setPiece(start.getPiece());
+        start.setPiece(null);
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                if (board.getBox(col, row).getPiece() instanceof King king && king.isWhite() == isWhite()) {
+                    boolean checked = king.isChecked(board, col, row);
+                    if (end.getPiece() instanceof King) {
+                        System.out.println(checked + " " + row + " " + col);
+                    }
+                    start.setPiece(end.getPiece());
+                    end.setPiece(null);
+                    return checked;
+                }
+            }
+        }
+        return false;
+    }
+
     public abstract int getIndex();
 
     protected boolean isTaken(Spot spot) {

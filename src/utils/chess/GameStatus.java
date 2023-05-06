@@ -7,9 +7,11 @@ package utils.chess;
  */
 public enum GameStatus {
     ACTIVE,
-    BLACK_WIN,
-    WHITE_WIN,
-    FORFEIT,
+    MATE_BLACK_WIN,
+    MATE_WHITE_WIN,
+    FORFEIT_BLACK,
+    FORFEIT_WHITE,
     STALEMATE,
-    RESIGNATION
+    RESIGNATION,
+    NOT_ENOUGH_FIGURES
 }

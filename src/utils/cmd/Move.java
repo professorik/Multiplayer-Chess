@@ -17,6 +17,7 @@ public class Move extends Message {
     private final int to;
     private final Coord f;
     private final Coord t;
+    private final long time;
 
     public Move(UUID ID, boolean isWhite, int from, int to) {
         this(ID, isWhite, from, to, Coord.EMPTY, Coord.EMPTY);
@@ -29,6 +30,7 @@ public class Move extends Message {
         this.to = to;
         this.f = f;
         this.t = t;
+        this.time = 1;
     }
 
     public boolean isWhite() {
@@ -49,5 +51,9 @@ public class Move extends Message {
 
     public Coord getT() {
         return t;
+    }
+
+    public long getTime() {
+        return time;
     }
 }

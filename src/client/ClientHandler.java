@@ -90,6 +90,7 @@ public class ClientHandler {
                     var tmp = ois.readObject();
                     switch (tmp) {
                         case utils.cmd.State cmd -> {
+                            System.out.println("NEW STATE");
                             var b = cmd.getBoard();
                             for (int i = 0; i < 8; i++) {
                                 for (int j = 0; j < 8; j++) {

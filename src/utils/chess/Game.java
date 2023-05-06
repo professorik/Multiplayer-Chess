@@ -41,11 +41,31 @@ public class Game {
         this.status = status;
     }
 
-    public boolean playerMove(Player player, int startX, int startY, int endX, int endY) throws Exception {
+    public void processEnding(Player player, Player opponent, long time) {
+        if (time <= 0) {
+            setStatus(player.isWhiteSide()? GameStatus.FORFEIT_WHITE: GameStatus.FORFEIT_BLACK);
+            return;
+        }
+        System.out.println("Checking for no moves");
+        if (noMoves(opponent)) {
+            System.out.println("WHAT");
+            if (isUnderCheck(opponent)) {
+                setStatus(player.isWhiteSide() ? GameStatus.MATE_BLACK_WIN : GameStatus.MATE_WHITE_WIN);
+            } else {
+                setStatus(GameStatus.STALEMATE);
+            }
+            return;
+        }
+        if (notEnoughFigures(player) && notEnoughFigures(opponent)) {
+            setStatus(GameStatus.NOT_ENOUGH_FIGURES);
+        }
+    }
+
+    public boolean playerMove(Player player, int startX, int startY, int endX, int endY) {
         return playerMove(player, startX, startY, endX, endY, null);
     }
 
-    public boolean playerMove(Player player, int startX, int startY, int endX, int endY, Pieces piece) throws Exception {
+    public boolean playerMove(Player player, int startX, int startY, int endX, int endY, Pieces piece) {
         Spot startBox = board.getBox(startX, startY);
         Spot endBox = board.getBox(endX, endY);
         Move move = new Move(player, startBox, endBox, piece);
@@ -54,7 +74,7 @@ public class Game {
 
     private boolean makeMove(Move move, Player player) {
         try {
-            System.out.println(player.whiteSide + " " + move);
+            //System.out.println(player.whiteSide + " " + move);
             if (player != currentTurn) return false;
 
             Piece sourcePiece = move.getStart().getPiece();
@@ -68,13 +88,13 @@ public class Game {
                 if (king.isCastlingMove(move.getStart(), move.getEnd())) {
                     int dc = move.getEnd().getX() - move.getStart().getX();
                     dc /= Math.abs(dc);
-                    Spot rookSpot = board.getBox(dc > 0? 7: 0, move.getStart().getY());
+                    Spot rookSpot = board.getBox(dc > 0 ? 7 : 0, move.getStart().getY());
                     Rook rook = (Rook) rookSpot.getPiece();
                     rook.setMoved(true);
 
                     rookSpot.setPiece(null);
                     board.getBox(move.getStart().getX() + dc, move.getStart().getY()).setPiece(rook);
-                    board.getBox(move.getStart().getX() + 2*dc, move.getStart().getY()).setPiece(king);
+                    board.getBox(move.getStart().getX() + 2 * dc, move.getStart().getY()).setPiece(king);
                     isNotCastling = false;
                 }
             } else if (sourcePiece instanceof Rook rook) {
@@ -93,7 +113,6 @@ public class Game {
                     Pieces piece = move.getPieceChosen();
                     if (piece == null) piece = Pieces.QUEEN;
                     move.getStart().setPiece(piece.getPiece(player.isWhiteSide()));
-                    //TODO: interchange the pawn to a chosen figure
                 }
                 pawn.setMoved(true);
             }
@@ -109,10 +128,6 @@ public class Game {
                 move.getEnd().setPiece(move.getStart().getPiece());
             move.getStart().setPiece(null);
 
-            if (destPiece instanceof King) {
-                setStatus(player.isWhiteSide() ? GameStatus.WHITE_WIN : GameStatus.BLACK_WIN);
-            }
-
             currentTurn = currentTurn == players[0] ? players[1] : players[0];
             System.out.println(board);
         } catch (Exception e) {
@@ -121,7 +136,7 @@ public class Game {
         return true;
     }
 
-    private boolean moveUnderCheck(Move move, Player player) throws Exception {
+    private boolean moveUnderCheck(Move move, Player player) {
         move.getEnd().setPiece(move.getStart().getPiece());
         move.getStart().setPiece(null);
         for (int row = 0; row < 8; row++) {
@@ -135,6 +150,58 @@ public class Game {
             }
         }
         return false;
+    }
+
+    private boolean isUnderCheck(Player player) {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                if (board.getBox(col, row).getPiece() instanceof King king && king.isWhite() == player.isWhiteSide())
+                    return king.isChecked(board, col, row);
+            }
+        }
+        return false;
+    }
+
+    private boolean noMoves(Player player) {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                var spot = board.getBox(col, row);
+                var piece = spot.getPiece();
+                if (piece == null || piece.isWhite() != player.isWhiteSide()) continue;
+                if (piece.canMove(board, spot)) {
+                    System.out.println(piece + " " + row + " " + col);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean notEnoughFigures(Player player) {
+        record Figure(Integer index, int row, int col) {
+            int getParity() {
+                return (row() + col()) % 2;
+            }
+        }
+
+        var list = new ArrayList<Figure>();
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                var piece = board.getBox(col, row).getPiece();
+                if (piece != null && piece.isWhite() == player.isWhiteSide() && !(piece instanceof King))
+                    list.add(new Figure(piece.getIndex(), row, col));
+            }
+        }
+        if (list.size() == 0) return true;
+        if (list.size() == 1)
+            return list.get(0).index == Pieces.BISHOP.ordinal() + 1 || list.get(0).index == Pieces.KNIGHT.ordinal() + 1;
+
+        int parity = list.get(0).getParity();
+        for (Figure f : list) {
+            if (f.index != Pieces.BISHOP.ordinal() + 1) return false;
+            if (f.getParity() != parity) return false;
+        }
+        return true;
     }
 
     public Board getBoard() {
