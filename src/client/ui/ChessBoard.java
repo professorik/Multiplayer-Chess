@@ -18,17 +18,18 @@ import java.util.HashMap;
 
 public class ChessBoard extends JPanel implements MouseListener, MouseMotionListener {
 
-    private final JLayeredPane layeredPane;
-    private final JPanel board;
-    private final JPanel pieces;
     private static final Image[][] chessPieceImages = new Image[2][6];
     private static final HashMap<Integer, ImageIcon> chessPieceLabels = new HashMap<>();
 
+    private final JLayeredPane layeredPane;
+    private final JPanel board;
+    private final JPanel pieces;
     private final Color BLACK = new Color(183, 192, 216);
     private final Color WHITE = new Color(232, 237, 249);
     private final JPanel[][] boardSquares = new JPanel[8][8];
     private final JPanel[][] piecesSquares = new JPanel[8][8];
     private final boolean white;
+
     private boolean turn = false;
     private final int[][] local = new int[][]{
             {-2,-4,-3,-6,-5,-3,-4,-2},
@@ -40,7 +41,6 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
             {1,1,1,1,1,1,1,1},
             {2,4,3,6,5,3,4,2},
     };
-
     private JLabel pieceToMoveButton = null;
     private int xAdj;
     private int yAdj;
@@ -265,19 +265,10 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
     }
 
     public void mergeBoards(int[][] board) {
-        /*System.out.println("=====================");
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                System.out.printf("%2s", local[i][j]);
-            }
-            System.out.println();
-        }
-        System.out.println("=====================");*/
         for (int i = 0; i < 8; i++) {
             var row = white? i: 7 - i;
             for (int j = 0; j < 8; j++) {
                 if (board[i][j] == local[i][j]) continue;
-                System.out.println("kar");
                 local[i][j] = board[i][j];
 
                 var sq = piecesSquares[row][white? j: 7 - j];
@@ -292,7 +283,6 @@ public class ChessBoard extends JPanel implements MouseListener, MouseMotionList
             }
         }
         repaint();
-        //System.out.println("=====================");
     }
 
     private ImageIcon getByCode(int code) {

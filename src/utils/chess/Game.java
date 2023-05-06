@@ -13,7 +13,7 @@ public class Game {
     private Player currentTurn;
     private GameStatus status;
 
-    private boolean capture, castling, check, mate;
+    private boolean capture, castling, check, checkmate;
     private String promotion;
 
     public Game() {
@@ -46,8 +46,8 @@ public class Game {
             setStatus(player.isWhiteSide() ? GameStatus.FORFEIT_WHITE : GameStatus.FORFEIT_BLACK);
             return;
         }
-        if (mate) {
-            setStatus(player.isWhiteSide() ? GameStatus.MATE_BLACK_WIN : GameStatus.MATE_WHITE_WIN);
+        if (checkmate) {
+            setStatus(player.isWhiteSide() ? GameStatus.MATE_WHITE_WIN : GameStatus.MATE_BLACK_WIN);
             return;
         }
         if (noMoves(currentTurn)) {
@@ -71,7 +71,7 @@ public class Game {
     }
 
     private boolean makeMove(Move move, Player player) {
-        capture = castling = check = mate = false;
+        capture = castling = check = checkmate = false;
         promotion = "";
 
         if (player != currentTurn) return false;
@@ -131,7 +131,7 @@ public class Game {
         if (isUnderCheck(currentTurn)) {
             check = true;
             if (noMoves(currentTurn)) {
-                mate = true;
+                checkmate = true;
             }
         }
         System.out.println(board);
@@ -206,7 +206,7 @@ public class Game {
 
     public String getLabel(int startFile, int startRank, int endFile, int endRank) {
         System.out.println(startRank + " " + startFile + " " + endRank + " " + endFile);
-        System.out.println(castling + " " + mate + " " + check + " " + capture);
+        System.out.println(castling + " " + checkmate + " " + check + " " + capture);
         System.out.println(promotion);
 
         if (castling) {
@@ -254,7 +254,7 @@ public class Game {
             n = "=" + promotion;
         }
         if (check) {
-            n += mate ? "#" : "+";
+            n += checkmate ? "#" : "+";
         }
         return p + d + m + f + r + n;
     }

@@ -6,7 +6,7 @@ import java.awt.*;
 
 public class GUI {
 
-    protected static Color background = new Color(43, 43, 44);
+    protected final static Color background = new Color(43, 43, 44);
 
     private final JPanel GUI = new JPanel(new BorderLayout(2, 2));
     private final ControlPanel controlPanel = new ControlPanel();
@@ -60,5 +60,9 @@ public class GUI {
 
     public void stopClocks() {
         controlPanel.stopClocks();
+    }
+
+    public long getTime() {
+       return controlPanel.getTime();
     }
 }

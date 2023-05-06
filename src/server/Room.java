@@ -1,7 +1,6 @@
 package server;
 
 import utils.chess.Game;
-import utils.chess.GameStatus;
 import utils.chess.Player;
 import utils.cmd.*;
 
@@ -63,7 +62,10 @@ public class Room {
             broadcastMirror(new State(move, false, "", game.getBoard().convert()));
 
         game.processEnding(player, move.getTime());
-        if (game.isEnd()) broadcast(new Finish(ID, game.getStatus()));
+        if (game.isEnd()) {
+            broadcast(new Finish(ID, game.getStatus()));
+            destruct();
+        }
     }
 
     protected void draw(SuggestDraw cmd) {
@@ -79,6 +81,12 @@ public class Room {
     protected void decline(DeclineDraw cmd) {
         drawPool.clear();
         broadcastExclusive(cmd);
+    }
+
+    protected void forfeit(Forfeit cmd) {
+        var user = userToPlayer.get(cmd.getID());
+        broadcast(new Finish(ID, !user.whiteSide, user.whiteSide, Finish.Reason.FORFEIT));
+        destruct();
     }
 
     protected void resign(Resign cmd) {

@@ -1,6 +1,7 @@
 package client;
 
 import client.ui.ButtonPanel;
+import client.ui.GUI;
 import client.ui.Popup;
 import utils.Coord;
 import utils.chess.Pieces;
@@ -21,7 +22,6 @@ public class ClientHandler {
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
     private final UUID ID;
-    private UUID roomID;
     private boolean white;
     private boolean turn;
 
@@ -45,12 +45,16 @@ public class ClientHandler {
         sendObj(new Message(ID, "s"));
     }
 
+    public void forfeit() {
+        sendObj(new Forfeit(ID));
+    }
+
     public void move(Coord f, Coord t) {
-        if (turn) sendObj(new Move(ID, white, -1, -1, f, t));
+        if (turn) sendObj(new Move(ID, white, -1, -1, f, t, Client.gui.getTime()));
     }
 
     public void move(Coord f, Coord t, Pieces piece) {
-        if (turn) sendObj(new PromotionMove(ID, white, -1, -1, f, t, piece));
+        if (turn) sendObj(new PromotionMove(ID, white, -1, -1, f, t, piece, Client.gui.getTime()));
     }
 
     public void resign() {
@@ -90,35 +94,21 @@ public class ClientHandler {
                     var tmp = ois.readObject();
                     switch (tmp) {
                         case utils.cmd.State cmd -> {
-                            System.out.println("NEW STATE");
-                            var b = cmd.getBoard();
-                            for (int i = 0; i < 8; i++) {
-                                for (int j = 0; j < 8; j++) {
-                                    System.out.printf("%2s", b[i][j]);
-                                }
-                                System.out.println();
-                            }
                             Client.gui.getChessBoard().mergeBoards(cmd.getBoard());
                             if (cmd.isSuccess()) {
                                 turn = !turn;
                                 Client.gui.addLabel(cmd.getLabel());
                                 Client.gui.toggleClocks(turn);
-                            } else {
-                                System.out.println("FAILED " + cmd.getF() + " " + cmd.getT());
                             }
                         }
                         case Start cmd -> {
-                            roomID = cmd.getID();
                             white = cmd.isWhite();
                             turn = white;
                             Client.gui.setupNewGame(white);
                             Client.gui.toggleClocks(turn);
                             Client.gui.setState(ButtonPanel.State.Standard);
                         }
-                        case SuggestDraw cmd -> {
-                            roomID = cmd.getID();
-                            Client.gui.setState(ButtonPanel.State.Offered);
-                        }
+                        case SuggestDraw ignored -> Client.gui.setState(ButtonPanel.State.Offered);
                         case DeclineDraw ignored -> Client.gui.setState(ButtonPanel.State.Standard);
                         case Finish cmd -> {
                             Client.gui.stopClocks();

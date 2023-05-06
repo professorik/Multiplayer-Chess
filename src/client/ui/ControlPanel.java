@@ -10,8 +10,11 @@ import java.awt.*;
  */
 public class ControlPanel extends JPanel {
 
+    private static final int TIME = 10;
+
     private final ButtonPanel buttonPanel = new ButtonPanel();
     private final Ledger ledger = new Ledger();
+
     private Clock upper;
     private Clock lower;
 
@@ -37,8 +40,8 @@ public class ControlPanel extends JPanel {
     }
 
     private void addClocks() {
-        upper = new Clock(300);
-        lower = new Clock(300);
+        upper = new Clock(TIME);
+        lower = new Clock(TIME);
 
         add(upper, BorderLayout.NORTH);
         add(lower, BorderLayout.SOUTH);
@@ -59,8 +62,12 @@ public class ControlPanel extends JPanel {
         lower.stop();
     }
 
+    protected long getTime() {
+        return lower.getSecs();
+    }
+
     protected void resetClocks() {
-        upper.setSecs(300);
-        lower.setSecs(300);
+        upper.setSecs(TIME);
+        lower.setSecs(TIME);
     }
 }

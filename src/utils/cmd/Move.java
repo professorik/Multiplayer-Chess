@@ -19,18 +19,18 @@ public class Move extends Message {
     private final Coord t;
     private final long time;
 
-    public Move(UUID ID, boolean isWhite, int from, int to) {
-        this(ID, isWhite, from, to, Coord.EMPTY, Coord.EMPTY);
-    }
-
-    public Move(UUID ID, boolean isWhite, int from, int to, Coord f, Coord t) {
+    public Move(UUID ID, boolean isWhite, int from, int to, Coord f, Coord t, long time) {
         super(ID, "M");
         this.isWhite = isWhite;
         this.from = from;
         this.to = to;
         this.f = f;
         this.t = t;
-        this.time = 1;
+        this.time = time;
+    }
+
+    public Move(UUID ID, boolean isWhite, int from, int to, Coord f, Coord t) {
+        this(ID, isWhite, from, to, f, t, 1);
     }
 
     public boolean isWhite() {

@@ -35,6 +35,7 @@ class ServerHandler extends Thread {
                     case SuggestDraw cmd -> Server.rooms.get(cmd.getID()).draw(cmd);
                     case DeclineDraw cmd -> Server.rooms.get(cmd.getID()).decline(cmd);
                     case Resign cmd -> Server.rooms.get(cmd.getID()).resign(cmd);
+                    case Forfeit cmd -> Server.rooms.get(cmd.getID()).forfeit(cmd);
                     case Message msg -> {
                         if (msg.getMessage().equals("stop")) {
                             this.downService();

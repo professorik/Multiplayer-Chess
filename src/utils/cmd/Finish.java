@@ -19,6 +19,7 @@ public class Finish extends Message {
         RESIGNATION,
         AGREEMENT,
         FORFEIT,
+        NO_FIGURES,
     }
 
     private final boolean isWhite;
@@ -36,10 +37,11 @@ public class Finish extends Message {
         this(ID, isWhite, isBlack);
         String tmp = isWhite? "White": "Black";
         switch (reason) {
-            case MATE -> this.reason = tmp + " won by mate";
+            case MATE -> this.reason = tmp + " won by checkmate";
             case STALEMATE -> this.reason = "Stalemate";
             case RESIGNATION -> this.reason = tmp + " won by resignation";
             case AGREEMENT -> this.reason = "By agreement";
+            case FORFEIT -> this.reason = "No time";
         }
     }
 
@@ -54,12 +56,13 @@ public class Finish extends Message {
             case FORFEIT_WHITE, FORFEIT_BLACK -> {
                 this.isBlack = status == FORFEIT_WHITE;
                 this.isWhite = !this.isBlack;
-                this.reason = "By forfeit";
+                this.reason = "No time";
             }
             case MATE_BLACK_WIN, MATE_WHITE_WIN -> {
                 this.isBlack = status == MATE_BLACK_WIN;
                 this.isWhite = !this.isBlack;
-                this.reason = "Checkmate";
+                String tmp = isWhite? "White": "Black";
+                this.reason = tmp + " won by checkmate";
             }
             default -> {
                 this.isBlack = false;

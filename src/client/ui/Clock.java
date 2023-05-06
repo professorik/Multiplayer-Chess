@@ -1,5 +1,7 @@
 package client.ui;
 
+import client.Client;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -34,7 +36,11 @@ public class Clock extends JPanel {
     private void setTimer() {
         int delay = 1000;
         timer = new Timer(delay, e -> {
-            --secs;
+            if (secs > 0) {
+                secs--;
+            } else {
+                Client.client.forfeit();
+            }
             label.setText(format(secs));
         });
     }
@@ -42,6 +48,10 @@ public class Clock extends JPanel {
     public void setSecs(int secs) {
         this.secs = secs;
         label.setText(format(this.secs));
+    }
+
+    public int getSecs() {
+        return secs;
     }
 
     protected void start() {

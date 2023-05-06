@@ -17,8 +17,9 @@ import java.util.ArrayList;
 public class Ledger extends JPanel {
 
     private final JTable table;
-    private boolean white;
     private final ArrayList<String[]> data;
+
+    private boolean white;
 
     public Ledger() {
         super(new BorderLayout());

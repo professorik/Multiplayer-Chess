@@ -12,17 +12,12 @@ import java.util.UUID;
  */
 public class PromotionMove extends Move {
 
-    //TODO: change to id
     private final Pieces piece;
 
-    public PromotionMove(UUID ID, boolean isWhite, int from, int to, Coord f, Coord t, Pieces piece) {
-        super(ID, isWhite, from, to, f, t);
+    public PromotionMove(UUID ID, boolean isWhite, int from, int to, Coord f, Coord t, Pieces piece, long time) {
+        super(ID, isWhite, from, to, f, t, time);
         if (piece == Pieces.KING || piece == Pieces.PAWN) piece = Pieces.QUEEN;
         this.piece = piece;
-    }
-
-    public PromotionMove(UUID ID, boolean isWhite, int from, int to, Pieces piece) {
-        this(ID, isWhite, from, to, Coord.EMPTY, Coord.EMPTY, piece);
     }
 
     public Pieces getPiece() {
