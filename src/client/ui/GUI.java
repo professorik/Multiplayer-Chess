@@ -54,6 +54,10 @@ public class GUI {
         chessBoard.setTurn(isActive);
     }
 
+    public void addLabel(String label) {
+        controlPanel.addLabel(label);
+    }
+
     public void stopClocks() {
         controlPanel.stopClocks();
     }

@@ -1,7 +1,6 @@
 package utils.chess;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author professorik
@@ -13,12 +12,13 @@ public class Game {
     private final Board board;
     private Player currentTurn;
     private GameStatus status;
-    private final List<Move> movesPlayed;
+
+    private boolean capture, castling, check, mate;
+    private String promotion;
 
     public Game() {
         players = new Player[2];
         board = new Board();
-        movesPlayed = new ArrayList<>();
     }
 
     public void initialize(Player p1, Player p2) {
@@ -43,7 +43,7 @@ public class Game {
 
     public void processEnding(Player player, Player opponent, long time) {
         if (time <= 0) {
-            setStatus(player.isWhiteSide()? GameStatus.FORFEIT_WHITE: GameStatus.FORFEIT_BLACK);
+            setStatus(player.isWhiteSide() ? GameStatus.FORFEIT_WHITE : GameStatus.FORFEIT_BLACK);
             return;
         }
         System.out.println("Checking for no moves");
@@ -73,70 +73,79 @@ public class Game {
     }
 
     private boolean makeMove(Move move, Player player) {
-        try {
-            //System.out.println(player.whiteSide + " " + move);
-            if (player != currentTurn) return false;
+        capture = castling = check = mate = false;
+        promotion = "";
 
-            Piece sourcePiece = move.getStart().getPiece();
-            if (sourcePiece == null || sourcePiece.isWhite() != player.isWhiteSide()) return false;
-            if (!sourcePiece.canMove(board, move.getStart(), move.getEnd())) return false;
-            if (moveUnderCheck(move, player)) return false;
+        if (player != currentTurn) return false;
+        Piece sourcePiece = move.getStart().getPiece();
+        // check if the player is allowed to move
+        if (sourcePiece == null || sourcePiece.isWhite() != player.isWhiteSide()) return false;
+        System.out.println(move.getEnd().getPiece() + " kar");
+        if (!sourcePiece.canMove(board, move.getStart(), move.getEnd())) return false;
+        System.out.println(move.getEnd().getPiece() + " kar");
+        if (moveUnderCheck(move, player)) return false;
 
-            boolean isNotCastling = true;
-            if (sourcePiece instanceof King king) {
-                king.setMoved(true);
-                if (king.isCastlingMove(move.getStart(), move.getEnd())) {
-                    int dc = move.getEnd().getX() - move.getStart().getX();
-                    dc /= Math.abs(dc);
-                    Spot rookSpot = board.getBox(dc > 0 ? 7 : 0, move.getStart().getY());
-                    Rook rook = (Rook) rookSpot.getPiece();
-                    rook.setMoved(true);
-
-                    rookSpot.setPiece(null);
-                    board.getBox(move.getStart().getX() + dc, move.getStart().getY()).setPiece(rook);
-                    board.getBox(move.getStart().getX() + 2 * dc, move.getStart().getY()).setPiece(king);
-                    isNotCastling = false;
-                }
-            } else if (sourcePiece instanceof Rook rook) {
+        System.out.println(move.getEnd().getPiece() + " kar");
+        if (sourcePiece instanceof King king) {
+            king.setMoved(true);
+            if (king.isCastlingMove(move.getStart(), move.getEnd())) {
+                int dc = move.getEnd().getX() - move.getStart().getX();
+                dc /= Math.abs(dc);
+                Spot rookSpot = board.getBox(dc > 0 ? 7 : 0, move.getStart().getY());
+                Rook rook = (Rook) rookSpot.getPiece();
                 rook.setMoved(true);
-            } else if (sourcePiece instanceof Pawn pawn) {
-                if (pawn.isCheckEnPassant()) {
-                    var prev = movesPlayed.get(movesPlayed.size() - 1);
-                    if (pawn.isEnPassant(move.getStart(), move.getEnd(), prev)) {
-                        move.setPieceKilled(prev.getEnd().getPiece());
-                        prev.getEnd().setPiece(null);
-                    } else {
-                        return false;
-                    }
-                }
-                if (pawn.isPromotion(move.getEnd())) {
-                    Pieces piece = move.getPieceChosen();
-                    if (piece == null) piece = Pieces.QUEEN;
-                    move.getStart().setPiece(piece.getPiece(player.isWhiteSide()));
-                }
-                pawn.setMoved(true);
+
+                rookSpot.setPiece(null);
+                board.getBox(move.getStart().getX() + dc, move.getStart().getY()).setPiece(rook);
+                board.getBox(move.getStart().getX() + 2 * dc, move.getStart().getY()).setPiece(king);
+                castling = true;
             }
-
-            Piece destPiece = move.getEnd().getPiece();
-            if (destPiece != null) {
-                destPiece.setKilled(true);
-                move.setPieceKilled(destPiece);
+        } else if (sourcePiece instanceof Rook rook) {
+            rook.setMoved(true);
+        } else if (sourcePiece instanceof Pawn pawn) {
+            if (pawn.isEnPassant()) {
+                var prev = board.getPrevMove();
+                move.setPieceKilled(prev.getEnd().getPiece());
+                prev.getEnd().setPiece(null);
+                capture = true;
             }
+            if (pawn.isPromotion(move.getEnd())) {
+                Pieces piece = move.getPieceChosen();
+                if (piece == null) piece = Pieces.QUEEN;
+                move.getStart().setPiece(piece.getPiece(player.isWhiteSide()));
 
-            movesPlayed.add(move);
-            if (isNotCastling)
-                move.getEnd().setPiece(move.getStart().getPiece());
-            move.getStart().setPiece(null);
-
-            currentTurn = currentTurn == players[0] ? players[1] : players[0];
-            System.out.println(board);
-        } catch (Exception e) {
-            e.printStackTrace();
+                promotion = move.getStart().getPiece().toString();
+            }
+            pawn.setMoved(true);
         }
+
+        System.out.println(move.getEnd().getPiece() + " kar");
+        Piece destPiece = move.getEnd().getPiece();
+        if (destPiece != null) {
+            destPiece.setKilled(true);
+            move.setPieceKilled(destPiece);
+            capture = true;
+        }
+
+        board.setPrevMove(move);
+        if (!castling)
+            move.getEnd().setPiece(move.getStart().getPiece());
+        move.getStart().setPiece(null);
+
+        currentTurn = currentTurn == players[0] ? players[1] : players[0];
+
+        if (isUnderCheck(currentTurn)) {
+            check = true;
+            if (noMoves(currentTurn)) {
+                mate = true;
+            }
+        }
+        System.out.println(board);
         return true;
     }
 
     private boolean moveUnderCheck(Move move, Player player) {
+        Piece end = move.getEnd().getPiece();
         move.getEnd().setPiece(move.getStart().getPiece());
         move.getStart().setPiece(null);
         for (int row = 0; row < 8; row++) {
@@ -144,7 +153,7 @@ public class Game {
                 if (board.getBox(col, row).getPiece() instanceof King king && king.isWhite() == player.isWhiteSide()) {
                     boolean checked = king.isChecked(board, col, row);
                     move.getStart().setPiece(move.getEnd().getPiece());
-                    move.getEnd().setPiece(null);
+                    move.getEnd().setPiece(end);
                     return checked;
                 }
             }
@@ -202,6 +211,61 @@ public class Game {
             if (f.getParity() != parity) return false;
         }
         return true;
+    }
+
+    public String getLabel(int startFile, int startRank, int endFile, int endRank) {
+        System.out.println(startRank + " " + startFile + " " + endRank + " " + endFile);
+        System.out.println(castling + " " + mate + " " + check + " " + capture);
+        System.out.println(promotion);
+
+        if (castling) {
+            return startFile < endFile ? "0-0" : "0-0-0";
+        }
+
+        Piece piece = board.getBox(endFile, endRank).getPiece();
+        String p = piece.toString();
+        if (piece instanceof Pawn) p = "";
+
+        String f = String.valueOf((char) ('a' + endFile));
+        String r = String.valueOf(endRank + 1);
+
+        String m = capture ? "x" : "";
+
+        String dFile = "", dRank = "";
+        for (int rank = 0; rank < 8; rank++) {
+            for (int file = 0; file < 8; file++) {
+                if ((rank == endRank && file == endFile) || (rank == startRank && file == startFile)) continue;
+                var spot = board.getBox(rank, file);
+                var tmp = spot.getPiece();
+                if (tmp == null || piece.isWhite() != tmp.isWhite() || piece.getIndex() != tmp.getIndex()) continue;
+
+                board.getBox(startFile, startRank).setPiece(piece);
+                board.getBox(endFile, endRank).setPiece(null);
+                boolean canMove = tmp.canMove(board, spot, board.getBox(endFile, endRank));
+                board.getBox(endFile, endRank).setPiece(piece);
+                board.getBox(startFile, startRank).setPiece(null);
+                if (canMove) {
+                    if (startFile != file) {
+                        dFile = String.valueOf((char) ('a' + startFile));
+                    } else {
+                        dRank = String.valueOf(startRank + 1);
+                    }
+                }
+            }
+        }
+        String d = dFile + dRank;
+        if (d.isEmpty() && capture && piece instanceof Pawn) {
+            d = String.valueOf((char) ('a' + startFile));
+        }
+
+        String n = "";
+        if (!promotion.isEmpty()) {
+            n = "=" + promotion;
+        }
+        if (check) {
+            n += mate ? "#" : "+";
+        }
+        return p + d + m + f + r + n;
     }
 
     public Board getBoard() {

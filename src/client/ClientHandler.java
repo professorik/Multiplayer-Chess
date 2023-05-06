@@ -101,6 +101,7 @@ public class ClientHandler {
                             Client.gui.getChessBoard().mergeBoards(cmd.getBoard());
                             if (cmd.isSuccess()) {
                                 turn = !turn;
+                                Client.gui.addLabel(cmd.getLabel());
                                 Client.gui.toggleClocks(turn);
                             } else {
                                 System.out.println("FAILED " + cmd.getF() + " " + cmd.getT());

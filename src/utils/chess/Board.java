@@ -18,6 +18,7 @@ public class Board {
             Pieces.ROOK
     };
     Spot[][] boxes = new Spot[STARTING_ROW.length][STARTING_ROW.length];
+    private Move prevMove;
 
     public Board() {
         this.resetBoard();
@@ -65,6 +66,30 @@ public class Board {
             }
         }
         return res;
+    }
+
+    public Move getPrevMove() {
+        return prevMove;
+    }
+
+    public void setPrevMove(Move move) {
+        this.prevMove = move;
+        /*
+        Spot start;
+        {
+            int c = move.getStart().getX();
+            int r = move.getStart().getY();
+            Piece piece = move.getStart().getPiece();
+            start = new Spot(r, c, piece);
+        }
+        Spot end;
+        {
+            int c = move.getEnd().getX();
+            int r = move.getEnd().getY();
+            Piece piece = move.getEnd().getPiece();
+            end = new Spot(r, c, piece);
+        }
+        this.prevMove = new Move(move.getPlayer(), start, end, move.getPieceChosen());*/
     }
 
     @Override

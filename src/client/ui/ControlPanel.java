@@ -28,6 +28,10 @@ public class ControlPanel extends JPanel {
         addClocks();
     }
 
+    public void addLabel(String label) {
+        ledger.addLabel(label);
+    }
+
     public void setState(ButtonPanel.State state) {
         buttonPanel.setState(state);
     }

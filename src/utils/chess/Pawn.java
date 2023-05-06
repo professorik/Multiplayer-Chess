@@ -8,16 +8,17 @@ package utils.chess;
 public class Pawn extends Piece {
 
     private boolean moved;
-    private boolean checkEnPassant;
+    private boolean isEnPassant;
 
     public Pawn(boolean white) {
         super(white);
         moved = false;
-        checkEnPassant = false;
+        isEnPassant = false;
     }
 
     @Override
     public boolean canMove(Board board, Spot start, Spot end) {
+        isEnPassant = false;
         if (isTaken(end)) return false;
 
         int adx = Math.abs(end.getX() - start.getX());
@@ -30,8 +31,11 @@ public class Pawn extends Piece {
         if (dy * adx == k){
             if (end.getPiece() != null && end.getPiece().isWhite() != isWhite()) return true;
 
-            checkEnPassant = true;
-            return true;
+            var prev = board.getPrevMove();
+            if (isEnPassant(start, end, prev)) {
+                isEnPassant = true;
+                return true;
+            }
         }
 
         return false;
@@ -46,7 +50,6 @@ public class Pawn extends Piece {
         int k = isWhite()? 1: -1;
         int adx = Math.abs(end.getX() - start.getX());
         int dy = end.getY() - start.getY();
-        System.out.println(k + " " + adx + " " + dy);
         if (prev.getEnd().getPiece() instanceof Pawn pawn && pawn.isDoubleMove(prev.getStart(), prev.getEnd())) {
             return start.getY() == prev.getEnd().getY() && end.getX() == prev.getEnd().getX() && dy * adx == k;
         }
@@ -57,16 +60,8 @@ public class Pawn extends Piece {
         this.moved = moved;
     }
 
-    /**
-     * One-shot flag indicating whether to check en passant
-     * @return boolean
-     */
-    public boolean isCheckEnPassant() {
-        if (checkEnPassant) {
-            checkEnPassant = false;
-            return true;
-        }
-        return false;
+    public boolean isEnPassant() {
+        return isEnPassant;
     }
 
     public boolean isPromotion(Spot end) {

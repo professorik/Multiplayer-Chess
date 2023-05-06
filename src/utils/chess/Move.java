@@ -54,6 +54,10 @@ public class Move {
         return end;
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("Move{");

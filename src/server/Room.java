@@ -58,13 +58,13 @@ public class Room {
             success = game.playerMove(player, startC, startR, endC, endR);
         }
         if (success)
-            broadcast(new State(move, true, "", game.getBoard().convert()));
+            broadcast(new State(move, true, game.getLabel(startC, startR, endC, endR), game.getBoard().convert()));
         else
             broadcastMirror(new State(move, false, "", game.getBoard().convert()));
 
-        Player opponent = userToPlayer.values().stream().filter(p -> p.whiteSide != player.whiteSide).findFirst().orElseThrow();
-        game.processEnding(player, opponent, move.getTime());
-        System.out.println(game.isEnd());
+        //Player opponent = userToPlayer.values().stream().filter(p -> p.whiteSide != player.whiteSide).findFirst().orElseThrow();
+        //game.processEnding(player, opponent, move.getTime());
+        //System.out.println(game.isEnd());
         if (game.isEnd()) broadcast(new Finish(ID, game.getStatus()));
     }
 
