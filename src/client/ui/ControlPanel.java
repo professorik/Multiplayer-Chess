@@ -10,7 +10,7 @@ import java.awt.*;
  */
 public class ControlPanel extends JPanel {
 
-    private static final int TIME = 10;
+    private static final int TIME = 600;
 
     private final ButtonPanel buttonPanel = new ButtonPanel();
     private final Ledger ledger = new Ledger();
@@ -69,5 +69,9 @@ public class ControlPanel extends JPanel {
     protected void resetClocks() {
         upper.setSecs(TIME);
         lower.setSecs(TIME);
+    }
+
+    protected void resetNotes() {
+        ledger.reset();
     }
 }

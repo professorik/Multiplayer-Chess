@@ -2,7 +2,6 @@ package client.ui;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -16,8 +15,8 @@ import java.util.ArrayList;
  */
 public class Ledger extends JPanel {
 
-    private final JTable table;
-    private final ArrayList<String[]> data;
+    private JTable table;
+    private ArrayList<String[]> data;
 
     private boolean white;
 
@@ -37,6 +36,15 @@ public class Ledger extends JPanel {
         pane.getVerticalScrollBar().setUI(new FlatScrollBarUI());
 
         add(pane, BorderLayout.CENTER);
+    }
+
+    protected void reset() {
+        white = true;
+        data = new ArrayList<>();
+        data.add(new String[]{"", "White", "Black"});
+        DefaultTableModel model = new DefaultTableModel();
+        model.setDataVector(getDataVector(), new Object[]{"№", "White", "Black"});
+        table.setModel(model);
     }
 
     public void addLabel(String label) {

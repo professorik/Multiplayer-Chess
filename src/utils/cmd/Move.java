@@ -13,36 +13,24 @@ import java.util.UUID;
 public class Move extends Message {
 
     private final boolean isWhite;
-    private final int from;
-    private final int to;
     private final Coord f;
     private final Coord t;
     private final long time;
 
-    public Move(UUID ID, boolean isWhite, int from, int to, Coord f, Coord t, long time) {
+    public Move(UUID ID, boolean isWhite, Coord f, Coord t, long time) {
         super(ID, "M");
         this.isWhite = isWhite;
-        this.from = from;
-        this.to = to;
         this.f = f;
         this.t = t;
         this.time = time;
     }
 
-    public Move(UUID ID, boolean isWhite, int from, int to, Coord f, Coord t) {
-        this(ID, isWhite, from, to, f, t, 1);
+    public Move(UUID ID, boolean isWhite, Coord f, Coord t) {
+        this(ID, isWhite, f, t, 1);
     }
 
     public boolean isWhite() {
         return isWhite;
-    }
-
-    public int getFrom() {
-        return from;
-    }
-
-    public int getTo() {
-        return to;
     }
 
     public Coord getF() {

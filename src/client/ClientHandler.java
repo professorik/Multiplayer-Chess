@@ -50,11 +50,11 @@ public class ClientHandler {
     }
 
     public void move(Coord f, Coord t) {
-        if (turn) sendObj(new Move(ID, white, -1, -1, f, t, Client.gui.getTime()));
+        if (turn) sendObj(new Move(ID, white, f, t, Client.gui.getTime()));
     }
 
     public void move(Coord f, Coord t, Pieces piece) {
-        if (turn) sendObj(new PromotionMove(ID, white, -1, -1, f, t, piece, Client.gui.getTime()));
+        if (turn) sendObj(new PromotionMove(ID, white, f, t, piece, Client.gui.getTime()));
     }
 
     public void resign() {

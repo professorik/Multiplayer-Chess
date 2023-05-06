@@ -14,8 +14,8 @@ public class PromotionMove extends Move {
 
     private final Pieces piece;
 
-    public PromotionMove(UUID ID, boolean isWhite, int from, int to, Coord f, Coord t, Pieces piece, long time) {
-        super(ID, isWhite, from, to, f, t, time);
+    public PromotionMove(UUID ID, boolean isWhite, Coord f, Coord t, Pieces piece, long time) {
+        super(ID, isWhite, f, t, time);
         if (piece == Pieces.KING || piece == Pieces.PAWN) piece = Pieces.QUEEN;
         this.piece = piece;
     }

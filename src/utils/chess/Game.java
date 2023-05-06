@@ -26,7 +26,7 @@ public class Game {
         players[1] = p2;
         currentTurn = p1.isWhiteSide() ? p1 : p2;
         status = GameStatus.ACTIVE;
-        System.out.println(board);
+        //System.out.println(board);
     }
 
     public boolean isEnd() {
@@ -134,7 +134,7 @@ public class Game {
                 checkmate = true;
             }
         }
-        System.out.println(board);
+        //System.out.println(board);
         return true;
     }
 
@@ -205,10 +205,6 @@ public class Game {
     }
 
     public String getLabel(int startFile, int startRank, int endFile, int endRank) {
-        System.out.println(startRank + " " + startFile + " " + endRank + " " + endFile);
-        System.out.println(castling + " " + checkmate + " " + check + " " + capture);
-        System.out.println(promotion);
-
         if (castling) {
             return startFile < endFile ? "0-0" : "0-0-0";
         }
