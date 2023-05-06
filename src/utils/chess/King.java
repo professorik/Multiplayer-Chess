@@ -30,11 +30,11 @@ public class King extends Piece {
         if (r < 2 && c < 2) return r + c != 0;
         if (r > 0) return false;
 
-        return this.isValidCastling(board, start, end);
+        return isValidCastling(board, start, end);
     }
 
     private boolean isValidCastling(Board board, Spot start, Spot end) {
-        if (this.isMoved()) return false;
+        if (isMoved()) return false;
 
         int dc = end.getX() - start.getX();
         int adc = Math.abs(dc);
@@ -43,18 +43,13 @@ public class King extends Piece {
 
         if (isMoved() || isChecked(board, start.getX(), start.getY())) return false;
 
-        try {
-            int col = start.getX() + dc;
-            for (; 0 < col && col < 7; col += dc) {
-                Spot spot = board.getBox(col, start.getY());
-                if (spot.getPiece() != null || isChecked(board, col, start.getY()))
-                    return false;
-            }
-            if (!(board.getBox(col, start.getY()).getPiece() instanceof Rook rook) || rook.isMoved())
+        int col = start.getX() + dc;
+        for (; 0 < col && col < 7; col += dc) {
+            Spot spot = board.getBox(col, start.getY());
+            if (spot.getPiece() != null || isChecked(board, col, start.getY()))
                 return false;
-        } catch (Exception ignored) {
         }
-        return true;
+        return board.getBox(col, start.getY()).getPiece() instanceof Rook rook && !rook.isMoved();
     }
 
     public boolean isCastlingMove(Spot start, Spot end) {
@@ -62,17 +57,14 @@ public class King extends Piece {
     }
 
     protected boolean isChecked(Board board, int c, int r) {
-        try {
-            for (int row = 0; row < 8; row++) {
-                for (int col = 0; col < 8; col++) {
-                    Spot tmp = board.getBox(col, row);
-                    Piece piece = tmp.getPiece();
-                    if (piece == null || piece.isWhite() == isWhite()) continue;
-                    if (!(piece instanceof Pawn && col == c) && piece.canMove(board, tmp, board.getBox(c, r)))
-                        return true;
-                }
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Spot tmp = board.getBox(col, row);
+                Piece piece = tmp.getPiece();
+                if (piece == null || piece.isWhite() == isWhite()) continue;
+                if (!(piece instanceof Pawn && col == c) && piece.canMove(board, tmp, board.getBox(c, r)))
+                    return true;
             }
-        } catch (Exception ignored) {
         }
         return false;
     }

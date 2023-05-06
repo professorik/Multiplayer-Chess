@@ -62,9 +62,7 @@ public class Room {
         else
             broadcastMirror(new State(move, false, "", game.getBoard().convert()));
 
-        //Player opponent = userToPlayer.values().stream().filter(p -> p.whiteSide != player.whiteSide).findFirst().orElseThrow();
-        //game.processEnding(player, opponent, move.getTime());
-        //System.out.println(game.isEnd());
+        game.processEnding(player, move.getTime());
         if (game.isEnd()) broadcast(new Finish(ID, game.getStatus()));
     }
 

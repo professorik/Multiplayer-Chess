@@ -41,22 +41,20 @@ public class Game {
         this.status = status;
     }
 
-    public void processEnding(Player player, Player opponent, long time) {
+    public void processEnding(Player player, long time) {
         if (time <= 0) {
             setStatus(player.isWhiteSide() ? GameStatus.FORFEIT_WHITE : GameStatus.FORFEIT_BLACK);
             return;
         }
-        System.out.println("Checking for no moves");
-        if (noMoves(opponent)) {
-            System.out.println("WHAT");
-            if (isUnderCheck(opponent)) {
-                setStatus(player.isWhiteSide() ? GameStatus.MATE_BLACK_WIN : GameStatus.MATE_WHITE_WIN);
-            } else {
-                setStatus(GameStatus.STALEMATE);
-            }
+        if (mate) {
+            setStatus(player.isWhiteSide() ? GameStatus.MATE_BLACK_WIN : GameStatus.MATE_WHITE_WIN);
             return;
         }
-        if (notEnoughFigures(player) && notEnoughFigures(opponent)) {
+        if (noMoves(currentTurn)) {
+            setStatus(GameStatus.STALEMATE);
+            return;
+        }
+        if (notEnoughFigures(player) && notEnoughFigures(currentTurn)) {
             setStatus(GameStatus.NOT_ENOUGH_FIGURES);
         }
     }
@@ -80,12 +78,9 @@ public class Game {
         Piece sourcePiece = move.getStart().getPiece();
         // check if the player is allowed to move
         if (sourcePiece == null || sourcePiece.isWhite() != player.isWhiteSide()) return false;
-        System.out.println(move.getEnd().getPiece() + " kar");
         if (!sourcePiece.canMove(board, move.getStart(), move.getEnd())) return false;
-        System.out.println(move.getEnd().getPiece() + " kar");
         if (moveUnderCheck(move, player)) return false;
 
-        System.out.println(move.getEnd().getPiece() + " kar");
         if (sourcePiece instanceof King king) {
             king.setMoved(true);
             if (king.isCastlingMove(move.getStart(), move.getEnd())) {
@@ -119,7 +114,6 @@ public class Game {
             pawn.setMoved(true);
         }
 
-        System.out.println(move.getEnd().getPiece() + " kar");
         Piece destPiece = move.getEnd().getPiece();
         if (destPiece != null) {
             destPiece.setKilled(true);
@@ -177,10 +171,7 @@ public class Game {
                 var spot = board.getBox(col, row);
                 var piece = spot.getPiece();
                 if (piece == null || piece.isWhite() != player.isWhiteSide()) continue;
-                if (piece.canMove(board, spot)) {
-                    System.out.println(piece + " " + row + " " + col);
-                    return false;
-                }
+                if (piece.canMove(board, spot)) return false;
             }
         }
         return true;

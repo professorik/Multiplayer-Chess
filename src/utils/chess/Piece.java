@@ -50,6 +50,7 @@ public abstract class Piece {
         if (start.getPiece() instanceof King) {
             System.out.println(start.getY() + " " + start.getX() + " -> " + end.getY() + " " + end.getX());
         }
+        var endPiece = end.getPiece();
         end.setPiece(start.getPiece());
         start.setPiece(null);
         for (int row = 0; row < 8; row++) {
@@ -60,7 +61,7 @@ public abstract class Piece {
                         System.out.println(checked + " " + row + " " + col);
                     }
                     start.setPiece(end.getPiece());
-                    end.setPiece(null);
+                    end.setPiece(endPiece);
                     return checked;
                 }
             }
