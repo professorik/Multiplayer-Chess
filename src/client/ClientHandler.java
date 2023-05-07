@@ -116,10 +116,6 @@ public class ClientHandler {
                             Popup.finish(cmd.getReason(), cmd.isWhite(), cmd.isBlack(), Client.client.white);
                         }
                         case Message cmd -> {
-                            if (cmd.getMessage().equals("stop")) {
-                                ClientHandler.this.downService();
-                                return;
-                            }
                             System.out.println(cmd.getID() + " " + cmd.getMessage());
                         }
                         default -> {}

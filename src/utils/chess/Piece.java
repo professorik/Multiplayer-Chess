@@ -47,9 +47,6 @@ public abstract class Piece {
     }
 
     private boolean moveUnderCheck(Board board, Spot start, Spot end) {
-        if (start.getPiece() instanceof King) {
-            System.out.println(start.getY() + " " + start.getX() + " -> " + end.getY() + " " + end.getX());
-        }
         var endPiece = end.getPiece();
         end.setPiece(start.getPiece());
         start.setPiece(null);
@@ -57,9 +54,6 @@ public abstract class Piece {
             for (int col = 0; col < 8; col++) {
                 if (board.getBox(col, row).getPiece() instanceof King king && king.isWhite() == isWhite()) {
                     boolean checked = king.isChecked(board, col, row);
-                    if (end.getPiece() instanceof King) {
-                        System.out.println(checked + " " + row + " " + col);
-                    }
                     start.setPiece(end.getPiece());
                     end.setPiece(endPiece);
                     return checked;
